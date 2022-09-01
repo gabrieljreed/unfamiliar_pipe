@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="unanim" label="UnAnim">
+    <memberTool name="layout"/>
+    <memberTool name="singe"/>
+    <memberTool name="maggie"/>
+    <memberTool name="kelleth"/>
+  </toolshelf>
+
+  <tool name="singe" label="Singe" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import os, functools
+
+#Global variables
+anim = 'singe'
+
+#Get hou file path
+hip = hou.hipFile.path()
+#Check if user is at least in the shots directories
+if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
+    #Get needed directories and paths
+    hip_dir = hip.split('/')[1:-1]
+    hip_dir = functools.reduce(lambda str, dir: str + dir + '/', hip_dir, '/')[:-1]
+    anim_dir = hip_dir + '/anim/'
+    anim_list = os.listdir(anim_dir)
+    alembic_path = anim_dir + anim + '/' + anim + "_main.abc"
+    #Checks if both a anim folder and alembic exist for desired anim
+    if (anim in anim_list) and (os.path.exists(alembic_path)):
+        #Create new unanim node
+        unanim = hou.node('/stage').createNode('unanim', node_name = anim)
+        unanim.allowEditingOfContents()
+        #Add the correct anim_name and publish the USD
+        unanim.parm('anim_name').set("singe")
+        unanim.parm('publish_button').pressButton()
+    else:
+        hou.ui.displayMessage("No animation has been published for " + anim)
+else:
+    hou.ui.displayMessage("You are not in a valid shot directory. Check out a shot and try again")]]></script>
+  </tool>
+
+  <tool name="maggie" label="Maggie" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import os, functools
+
+#Global variables
+anim = 'maggie'
+
+#Get hou file path
+hip = hou.hipFile.path()
+#Check if user is at least in the shots directories
+if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
+    #Get needed directories and paths
+    hip_dir = hip.split('/')[1:-1]
+    hip_dir = functools.reduce(lambda str, dir: str + dir + '/', hip_dir, '/')[:-1]
+    anim_dir = hip_dir + '/anim/'
+    anim_list = os.listdir(anim_dir)
+    alembic_path = anim_dir + anim + '/' + anim + "_main.abc"
+    #Checks if both a anim folder and alembic exist for desired anim
+    if (anim in anim_list) and (os.path.exists(alembic_path)):
+        #Create new unanim node
+        unanim = hou.node('/stage').createNode('unanim', node_name = anim)
+        unanim.allowEditingOfContents()
+        #Add the correct anim_name and publish the USD
+        unanim.parm('anim_name').set(anim)
+        unanim.parm('publish_button').pressButton()
+    else:
+        hou.ui.displayMessage("No animation has been published for " + anim)
+else:
+    hou.ui.displayMessage("You are not in a valid shot directory. Check out a shot and try again")]]></script>
+  </tool>
+
+  <tool name="kelleth" label="Kelleth" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import os, functools
+
+#Global variables
+anim = 'kelleth'
+
+#Get hou file path
+hip = hou.hipFile.path()
+#Check if user is at least in the shots directories
+if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
+    #Get needed directories and paths
+    hip_dir = hip.split('/')[1:-1]
+    hip_dir = functools.reduce(lambda str, dir: str + dir + '/', hip_dir, '/')[:-1]
+    anim_dir = hip_dir + '/anim/'
+    anim_list = os.listdir(anim_dir)
+    alembic_path = anim_dir + anim + '/' + anim + "_main.abc"
+    #Checks if both a anim folder and alembic exist for desired anim
+    if (anim in anim_list) and (os.path.exists(alembic_path)):
+        #Create new unanim node
+        unanim = hou.node('/stage').createNode('unanim', node_name = anim)
+        unanim.allowEditingOfContents()
+        #Add the correct anim_name and publish the USD
+        unanim.parm('anim_name').set(anim)
+        unanim.parm('publish_button').pressButton()
+    else:
+        hou.ui.displayMessage("No animation has been published for " + anim)
+else:
+    hou.ui.displayMessage("You are not in a valid shot directory. Check out a shot and try again")]]></script>
+  </tool>
+
+  <tool name="layout" label="Layout" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+
+unlayout = hou.node("/stage").createNode("unlayout", node_name = "unlayout")
+unlayout.allowEditingOfContents()]]></script>
+  </tool>
+</shelfDocument>

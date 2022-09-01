@@ -1,0 +1,34 @@
+{
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Import DAG to animate USD",
+			"label":"DAG Import",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnPrevis.importDAG",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Export DAG anim to USD",
+			"label":"USD Export Anim",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnPrevis.exportAnim",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Export Camera to FBX",
+			"label":"Cam FBX Export",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnPrevis.unMaya_FBX_CamExporter",
+			"function":"Camera_Exporter.run()"
+		}
+    ]
+}

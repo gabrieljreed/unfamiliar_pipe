@@ -1,0 +1,24 @@
+{
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"add.png",
+			"annotation":"Get asset list",
+			"label":"Asset",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.shotgrid_Interface",
+			"function":"shotgrid_Interface.getAssetLists.()"
+		},
+		{
+			"itemType":"button",
+			"icon":"add.png",
+			"annotation":"Get shot list",
+			"label":"Shot",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.shotgrid_Interface",
+			"function":"shotgrid_Interface.getShotList()"
+		}
+    ]
+}

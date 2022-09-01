@@ -1,0 +1,24 @@
+{
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"frog_open.png",
+			"annotation":"Checkout",
+			"label":"Checkout",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnFiles.unMaya_Checkout",
+			"function":"ShotCheckout.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"load.png",
+			"annotation":"Publish",
+			"label":"Publish",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnFiles.unMaya_ShotPublish",
+			"function":"UnMaya_ShotPublish.run()"
+		}
+    ]
+}

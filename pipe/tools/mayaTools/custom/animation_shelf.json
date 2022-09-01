@@ -1,0 +1,84 @@
+{
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"kelleth_icon.png",
+			"annotation":"Reference Kelleth Rig",
+			"label":"KELLETH",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('kelleth')"
+		},
+		{
+			"itemType":"button",
+			"icon":"maggie_icon.png",
+			"annotation":"Reference Maggie Rig",
+			"label":"MAGGIE",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('maggie')"
+		},
+		{
+			"itemType":"button",
+			"icon":"singe_icon.jpeg",
+			"annotation":"Reference Singe Rig",
+			"label":"SINGE",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('singe')"
+		},
+		{
+			"itemType":"button",
+			"icon":"frog.png",
+			"annotation":"Reference Frog Rig",
+			"label":"FROG",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('frog')"
+		},
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Import Layout",
+			"label":"LAYOUT",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.importLayout",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Import shot camera",
+			"label":"CAM",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.camera()"
+		},
+		{
+			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Import Production Model",
+			"label":"PROD",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.importProdModel",
+			"function":"mayaRun.run()"
+		},
+                {
+			"itemType":"button",
+			"icon":"publish.svg",
+			"annotation":"Export Alembic",
+			"label":"ExportAlembic",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.unMaya_Alembic_Exporter",
+			"function":"UnMaya_Alembic_Exporter.run()"
+		}
+    ]
+}

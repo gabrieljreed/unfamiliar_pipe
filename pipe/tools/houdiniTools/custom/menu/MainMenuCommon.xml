@@ -1,0 +1,42 @@
+<mainMenu>
+<menuBar>
+<!--  ============================ Start Pipe Tools Menu ===========================  -->
+<!--  if calling a tool that uses gui, need to reference the tool with hou.session to keep the tool in memory  -->
+<subMenu id="tools_menu">
+<label>UnPipe</label>
+	<!--  ============================ Start Shot subMenu ===========================  -->
+	<subMenu id="shot_menu">
+		<label>Shot</label>
+		<!--  ============================ Start Shot Checkout Tool ===========================  -->
+		<scriptItem id="h.shotCheckout">
+			<label>Checkout</label>
+			<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.checkout import shot_checkout
+import hou
+checkout = shot_checkout.ShotCheckout()
+hou.session.checkout = checkout
+checkout.checkout()
+				]]>
+			</scriptCode>
+		</scriptItem>
+		<!--  ============================ End Shot Checkout Tool ===========================  -->
+		<!--  ============================ Start Shot Return Tool ===========================  -->
+		<scriptItem id="h.shotReturn">
+			<label>Return</label>
+			<scriptCode scriptType="python">
+				<![CDATA[
+from pipe.tools.houdiniTools.publish import shot_publish
+import hou
+publish = shot_publish.ShotPublish()
+hou.session.publish = publish
+publish.publish()
+				]]>
+			</scriptCode>
+		</scriptItem>
+		<!--  ============================ End Shot Return Tool ===========================  -->
+	</subMenu>
+	<!--  ============================ End Shot subMenu ===========================  -->
+</subMenu>
+</menuBar>
+</mainMenu>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="shading_shelf" label="UnShading">
+    <memberTool name="edit_geo"/>
+    <memberTool name="edit_shader"/>
+    <memberTool name="Build Shader"/>
+    <memberTool name="Txmake Repath"/>
+  </toolshelf>
+
+  <tool name="edit_geo" label="Edit Model" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import importlib
+import pipe.tools.houdiniTools.shading.edit_geo as edit_geo
+importlib.reload(edit_geo)
+
+editGeo = edit_geo.EditGeo()
+hou.session.editGeo = editGeo
+editGeo.assetSelect()]]></script>
+  </tool>
+
+  <tool name="edit_shader" label="Edit Shader" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import importlib
+import pipe.tools.houdiniTools.shading.edit_shader as EditShader
+importlib.reload(EditShader)
+
+editShader = EditShader.EditShader()
+hou.session.editShader = editShader
+editShader.assetSelect()]]></script>
+  </tool>
+
+  <tool name="Build Shader" label="Build Shader" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import importlib
+import pipe.tools.houdiniTools.shading.build_shader as curTool
+importlib.reload(curTool)
+
+from pipe.tools.houdiniTools.shading.build_shader import BuildShader
+
+buildShader = BuildShader()
+hou.session.buildShader = buildShader]]></script>
+  </tool>
+
+  <tool name="Txmake Repath" label="Txmake Repath" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import importlib
+import pipe.tools.houdiniTools.shading.txmake_repath as curTool
+importlib.reload(curTool)
+
+from pipe.tools.houdiniTools.shading.txmake_repath import TxmakeRepath
+
+txmakeRepath = TxmakeRepath()
+hou.session.txmakeRepath = txmakeRepath]]></script>
+  </tool>
+</shelfDocument>

@@ -1,0 +1,9 @@
+python("import sys; import os");
+python("SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')");
+python("sys.path.append(SHELF_DIR)");
+python("print(SHELF_DIR)");
+python("import create_shelf");
+python("create_shelf.load_shelf(\"UnPrevis\", \"previs_shelf.json\")");
+python("create_shelf.load_shelf(\"UnAnim\", \"animation_shelf.json\")");
+python("create_shelf.load_shelf(\"UnFiles\", \"shot_management_shelf.json\")");
+print "successfully loaded shelves!\n";

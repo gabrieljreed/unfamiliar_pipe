@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=0.1
+Name=witchs_cataya
+Name[en_US]=unMaya
+Comment=BYU_anm_pipe shortcut for Maya
+Exec=/groups/unfamiliar/anim_pipeline/launch/maya.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/frog.png
+Terminal=false
+Type=Application
+Categories=Utility;Application;
