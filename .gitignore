@@ -1,1 +1,3 @@
 /production/
+**/*.pyc
+**/__pycache__/
