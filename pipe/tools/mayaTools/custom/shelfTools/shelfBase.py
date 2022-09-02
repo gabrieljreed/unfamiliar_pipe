@@ -64,3 +64,11 @@ class ShelfBase(object):
                     mc.deleteUI(each)
         else:
             mc.shelfLayout(self.name, p=getTopLevelShelf())
+        
+        string = mm.eval("getenv MAYA_APP_DIR")
+        version = mm.eval("about -v")
+        path = os.path.join(string, version, "prefs", "shelves", "shelf_{}.mel.deleted".format(self.name))
+
+        if os.path.exists(path):
+            os.remove(path)
+            print("Deleted {}".format(path))
