@@ -16,7 +16,6 @@ export MAYA_SCRIPT_PATH=${MAYA_SCRIPT_PATH}:${MEDIA_PROJECT_DIR}'/pipe/tools/may
 export MAYAUSD_EXPORT_MAP1_AS_PRIMARY_UV_SET=1
 export MAYAUSD_IMPORT_PRIMARY_UV_SET_AS_MAP1=1
 
-
 #Export the maya ICON directory to be used when creating shelves
 export MAYA_ICONS_DIR=${MEDIA_PROJECT_DIR}'/icons/'
 
@@ -33,4 +32,3 @@ maya -script ${MEDIA_PROJECT_DIR}/pipe/tools/mayaTools/custom/shelf.mel &
 #this does eventually break the icons:
 
 #export XBMLANGPATH=${XBMLANGPATH}:${MEDIA_PROJECT_DIR}'/icons/%B'
-#export MAYA_ICONS_DIR=${MEDIA_PROJECT_DIR}'/icons/'
