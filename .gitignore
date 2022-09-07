@@ -1,5 +1,5 @@
 /production/
-**/*.pyc
+*.pyc
 **/__pycache__/
 **/env.sh
 **/.vscode/
