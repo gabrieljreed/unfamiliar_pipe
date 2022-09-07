@@ -16,6 +16,7 @@ from pipe.tools.mayaTools.utilities.reload_scripts import *
 
 SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
 ICON_DIR = os.environ.get('MAYA_ICONS_DIR')
+print("SHELF_DIR: {}".format(SHELF_DIR))
 os.environ["DCC_ASSET_NAME"] = ""
 os.environ["DCC_DEPARTMENT"] = ""
 
@@ -25,6 +26,10 @@ os.environ["DCC_DEPARTMENT"] = ""
 	follow the instructions at the top of this file.
 '''
 def load_shelf(shelfName, fileName):
+	# Doing this again as a safety measure since sometimes the environment variables don't get picked up
+	SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
+	ICON_DIR = os.environ.get('MAYA_ICONS_DIR')
+
 	print("loading ", shelfName)
 	delete_shelf(shelfName)
 	ReloadScripts().go()
