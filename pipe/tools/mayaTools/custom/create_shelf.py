@@ -26,20 +26,27 @@ os.environ["DCC_DEPARTMENT"] = ""
 	follow the instructions at the top of this file.
 '''
 def load_shelf(shelfName, fileName):
-	# Doing this again as a safety measure since sometimes the environment variables don't get picked up
+	# Doing this again as a safety measure for when loading shelves using python
 	SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
 	ICON_DIR = os.environ.get('MAYA_ICONS_DIR')
 
-	print("loading ", shelfName)
+	# Load in the json data
+	json_file = open(os.path.join(SHELF_DIR, fileName))
+	data = json.loads(json_file.read())
+
+	if "shelfName" in data:
+		shelfName = data["shelfName"]
+	else:
+		shelfName = os.path.splitext(fileName)[0]
+
+	print("Loading shelf: {}".format(shelfName))
 	delete_shelf(shelfName)
+	deleteSimilarShelves(os.path.splitext(fileName)[0])
 	ReloadScripts().go()
 
 	gShelfTopLevel = pm.mel.eval('global string $gShelfTopLevel; string $temp=$gShelfTopLevel')
 	pm.shelfLayout(shelfName, cellWidth=33, cellHeight=33, p=gShelfTopLevel)
-
-	# Load in the buttons
-	json_file = open(os.path.join(SHELF_DIR, fileName))
-	data = json.loads(json_file.read())
+	
 	for shelf_item in data['shelfItems']:
 		if shelf_item['itemType'] == 'button':
 			icon = os.path.join(ICON_DIR, shelf_item['icon'])
@@ -99,3 +106,14 @@ def build_menu_string(command_base, menu_items):
 def delete_shelf(shelfName):
 	if pm.shelfLayout(shelfName, exists=True):
 		pm.deleteUI(shelfName)
+
+
+def deleteSimilarShelves(fileName):
+	"""Deletes all shelves that have the same name as the file name
+	@param fileName: The name of the shelf file"""
+	mayaPath = os.path.join(os.environ['MAYA_APP_DIR'], '2023', 'prefs', 'shelves')
+
+	for file in os.listdir(mayaPath):
+		if fileName in file or "json" in file:
+			os.remove(os.path.join(mayaPath, file))
+			print("Deleted old shelf: {}".format(file))

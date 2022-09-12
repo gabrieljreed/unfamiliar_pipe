@@ -1,0 +1,36 @@
+{
+	"shelfName": "UnDev",
+
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"debug-all.svg",
+			"annotation":"Start debug session",
+			"label":"Debug",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnDev.debugging",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"package.svg",
+			"annotation":"Unload all packages",
+			"label":"Unload",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnDev.unloadPackages",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"exclamationMark.svg",
+			"annotation":"Issue",
+			"label":"Report Issue",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnDev.reportIssue",
+			"function":"mayaRun.run()"
+		}
+    ]
+}

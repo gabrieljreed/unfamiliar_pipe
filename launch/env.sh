@@ -4,7 +4,7 @@
 #Depending on how future projects are set up, other directories might have to be re-routed.
 
 #Enviornment variables for the main folder and pipe script locations
-export MEDIA_PROJECT_DIR=/users/anim_guest/gjr215/Desktop/unfamiliar_pipe
+export MEDIA_PROJECT_DIR=/groups/unfamiliar/anim_pipeline
 export MEDIA_PIPE_DIR=$MEDIA_PROJECT_DIR/pipe
 #Environment variable for location of python scripts
 export PYTHONPATH=${MEDIA_PROJECT_DIR}:${MEDIA_PIPE_DIR}:${MEDIA_PROJECT_DIR}/lib/

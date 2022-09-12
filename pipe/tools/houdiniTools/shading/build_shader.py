@@ -32,21 +32,30 @@ class BuildShader():
                 #remove spaces
                 shaderName = shaderName.replace(" ","_")
                 named = 1
-                #hopefully this helps with debugging - if the shaderName 
-                #the code thinks it has is not the one you think it should
-                #have, take a closer look at exactly what file names you're
-                #giving it 
                 print("creating shader for "+shaderName)
             else: continue
-            
+
             matLibLoc = "/stage/"+prefix+"_"+str(shaderName)+"/"
-            if(matLibLoc == None):
-                print("uh oh")
-                print(matLibLoc) 
-                print("yo there's a problem. Double check that you're pointing to the right "+
-                "texture folder and that your texture files are named appropriately.")
+            print("matLibLoc = "+str(matLibLoc))
             matLib = hou.node(matLibLoc)
+            print("matLib = "+str(matLib))
+            #TODO: if node doesn't exist, create it and use that as a location to build the shader
+            '''
+            if(hou.node(matLibLoc) == None):
+                print("no material library exists at "+matLibLoc+". Creating material library")
+                hou.node("/stage").createNode("materiallibrary","materiallibrary_plswork")
+                matLib = hou.node("/stage/"+prefix+"_"+str(shaderName))
+                print("new matLib = "+str(matLib))
+            '''
+            if(hou.node(matLibLoc) == None):
+                print("no material library exists at "+matLibLoc+". Creating material library")
+                #print("matLibLoc = "+str(matLibLoc))
+                hou.node("/stage/").createNode("materiallibrary",prefix+str(shaderName))
+                hou.node("/stage").createNode("camera", "YOO")
+            matLib = hou.node(matLibLoc)
+            print("matLib = "+str(matLib))
             
+
             #Prep material library
             #cleanup network 
             toDelete = hou.vopNodeTypeCategory().nodeType("usdpreviewsurface").instances()
@@ -76,6 +85,8 @@ class BuildShader():
                 pxrSurface.setInput(14,specRoughness,1)
                 #normal 
                 normal = matLib.createNode("pxrnormalmap","normal_map")
+                normal.parm("invertBump").set("1")
+                #normal.parm("bumpScale").set(0.75)
                 pxrSurface.setInput(103,normal,0)
                 #displacement
                 pxrDisplace = matLib.createNode("pxrdisplace")
@@ -135,7 +146,7 @@ class BuildShader():
                         #print ("unmodified full file path is as follows: " + fullFilePath)
                         if(UDIMs == 1):
                             #SET FILE PATH USING UDIM SYNTAX
-                            print("yes UDIMs")
+                            #print("yes UDIMs")
                             #remove ".10**.png" and replace with ".<UDIM>.png"
                             splitIndex = fullFilePath.find(".10")
                             udimFilePath = fullFilePath[:splitIndex] + ".<UDIM>"+fileFormat
@@ -146,7 +157,7 @@ class BuildShader():
                                 mapTypeNode.parm("file").set(udimFilePath)
                             #print ("UDIM file path is as follows: " + udimFilePath)
                         elif(UDIMs == 0):
-                            print("no UDIMs")
+                            #print("no UDIMs")
                             #SET FILE PATH DEFAULT METHOD
                             if(purpose == "prod"):
                                 mapTypeNode.parm("filename").set(fullFilePath)
@@ -170,9 +181,45 @@ class BuildShader():
             #layout all shader nodes
             matLib.layoutChildren()
             #end function definitions
-            #lol how do you even format this 
+            #lol how do you even format python huh 
             #who knows
-    ####################################################################################################
+
+    #get info from user
+    #prod or previs?
+    #does it use UDIMs?
+    #what filetype are the images? 
+
+
+
+
+
+
+
+    def GetInput(popupMessage,popupTitle,buttons):
+        buttonString = ""
+        for button in buttons:
+            buttonString.append(button)
+
+        userChoice = hou.ui.displayMessage(popupMessage,buttons=(button0,button1,),defaultchoice=0,title=popupTitle)
+
+        #default choice
+        if(userChoice == 0):
+            blah
+        #alternative
+        elif(userChoice == 1):
+            quit()
+
+
+    def ConfirmChoice(self,popupMessage,popupTitle):
+        userChoice = hou.ui.displayMessage(popupMessage,buttons=("okay","close",),default_choice=0,title=popupTitle)
+
+        if(userChoice == 0):
+            return 1
+        elif(userChoice == 1):
+            return 0
+            quit()
+
+
 
     #get texture folder and file format     
     #get filepath
@@ -188,7 +235,7 @@ class BuildShader():
     filePath = filePath.replace("\\","/")
     #print("corrected relative filepath is: " + filePath)
 
-    fileFormatNum = hou.ui.displayMessage("What file format did you use to save your texture " + 
+    fileFormatNum = hou.ui.displayMessage("Which file format did you use to save your texture " + 
     "files?",buttons=(".png",".jpg",".tif","close",),default_choice=0,title="import texture files")
 
     if(fileFormatNum == 0):

@@ -1,0 +1,1 @@
+chmod: changing permissions of ‘./.gitignore’: Operation not permitted

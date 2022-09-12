@@ -17,7 +17,26 @@ class ShotCheckout:
         #Get shot list
         self.shot_list = self.curr_env.get_shot_list()
         self.shot_list = sorted(self.shot_list)
-        self.checkout_gui()
+        self.check_save_state()
+    
+    #checks if the current scene has any unsaved changes, and prompts user to save or not
+    def check_save_state(self):
+        unSaved = cmds.file(q=True, modified=True)
+        if unSaved:
+            print("Current Scene not saved")
+            mes = "There are unsaved changes to the current file"
+            confirm = cmds.confirmDialog ( title='WARNING', message=mes, button=['Save and Continue', 'Continue without Saving', 'Cancel'], defaultButton='Save and Continue', dismissString='Cancel' )
+            if confirm == "Save and Continue":
+                cmds.SaveScene()
+                self.check_save_state()
+            elif confirm == "Continue without Saving":
+                self.checkout_gui()
+            else:
+                pass
+                    
+        else:
+            self.checkout_gui()
+    
     
      #Receives a textScrollList and returns the currently selected list item
     def getSelected(self, scrollList):
@@ -74,7 +93,7 @@ class ShotCheckout:
             #Write the .element file to disk
             el.write_element_file()
             #open the .mb file
-            cmds.file(mb_dir, open=True)
+            cmds.file(mb_dir, open=True, force=True)
             
             if cmds.window("ms_checkout_GUI", exists=True):
                 cmds.deleteUI("ms_checkout_GUI")

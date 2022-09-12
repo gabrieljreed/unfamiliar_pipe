@@ -6,4 +6,6 @@ python("import create_shelf");
 python("create_shelf.load_shelf(\"UnPrevis\", \"previs_shelf.json\")");
 python("create_shelf.load_shelf(\"UnAnim\", \"animation_shelf.json\")");
 python("create_shelf.load_shelf(\"UnFiles\", \"shot_management_shelf.json\")");
+python("create_shelf.load_shelf(\"UnDev\", \"dev_shelf.json\")");
+// Automatically grab all .json files in folder
 print "successfully loaded shelves!\n";

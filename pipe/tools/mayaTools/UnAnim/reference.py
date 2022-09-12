@@ -35,6 +35,9 @@ class reference:
         elif rigName == 'frog':
             filePath = '/groups/unfamiliar/anim_pipeline/production/rigs/frog/frog_main.mb'
 
+        elif rigName == 'amoogus':
+            filePath = '/groups/unfamiliar/anim_pipeline/production/rigs/amoogus/amoogus_main.ma'
+
         else:
             logMessage('Rig Importer', 'Rig does\'nt exist')
             return

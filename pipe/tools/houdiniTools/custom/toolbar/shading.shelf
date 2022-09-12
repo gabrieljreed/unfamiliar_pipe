@@ -10,6 +10,7 @@
     <memberTool name="edit_shader"/>
     <memberTool name="Build Shader"/>
     <memberTool name="Txmake Repath"/>
+    <memberTool name="Tex Delete"/>
   </toolshelf>
 
   <tool name="edit_geo" label="Edit Model" icon="PLASMA_App">

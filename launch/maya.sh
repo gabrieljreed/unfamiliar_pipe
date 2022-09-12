@@ -10,7 +10,7 @@ source $SOURCEDIR/env.sh
 export MAYA_SHELF_DIR=${MEDIA_PROJECT_DIR}'/pipe/tools/mayaTools/custom/'
 
 #Export the script paths
-export MAYA_SCRIPT_PATH=${MAYA_SCRIPT_PATH}:${MEDIA_PROJECT_DIR}'/pipe/tools/mayaTools/scripts/'
+export MAYA_SCRIPT_PATH=${MAYA_SCRIPT_PATH}:${MEDIA_PROJECT_DIR}'/pipe/tools/mayaTools/scripts/':${MEDIA_PROJECT_DIR}'/pipe/tools/mayaTools/vendor/'
 
 #Export the maya USD environment variables
 export MAYAUSD_EXPORT_MAP1_AS_PRIMARY_UV_SET=1
@@ -24,7 +24,7 @@ unset OCIO
 
 #Start Maya
 echo "Starting Maya..."
-maya -script ${MEDIA_PROJECT_DIR}/pipe/tools/mayaTools/custom/shelf.mel &
+maya #-script ${MEDIA_PROJECT_DIR}/pipe/tools/mayaTools/custom/shelf.mel &
 
 
 

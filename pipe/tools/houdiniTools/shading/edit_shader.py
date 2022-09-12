@@ -1,3 +1,4 @@
+from email.iterators import body_line_iterator
 import hou
 import pipe.pipeHandlers.gui as gui
 from pipe.pipeHandlers.environment import Environment as env
@@ -120,36 +121,41 @@ class EditShader():
         usdRop.setInput(0, objectViewer, 0)
         usdRop.parm("lopoutput").set("/groups/unfamiliar/shading/throwaway_usd/" + ASSET_NAME + "_delete.usda")
 
-        ### This is a patch to 1. correct the filepath on pxrtextures when loading a previosuly 
-        #created shader 2. activate a couple important parameters. Eventually I want to activate
-        #all parameters by default, but I don't have time for that rn. lmk if this causes bugs.
-        # - anna
-        '''
-        #ZACH EDIT bro we gotta clean up this code later frfr. anyways editing this section out and adding
-        #a single line so Anna's patch only affects the currently created matnet, not all of them.
-        stageNodes = stage.children()
-        print(stageNodes)
-        matLibNodes = []
-        #get all material library nodes in stage
-        for node in stageNodes:
-            if(node.name().startswith("pxr") or node.name().startswith("unreal")):
-                matLibNodes.append(node)
-                print(matLibNodes)
-		'''
         matLibNodes = [matLib]
-        '''
-        #END ZACH EDIT OF ANNA'S EDIT. ugh 
-        '''
+
         #for each material library node... 
         for matLibNode in matLibNodes:
             #get all children
             matLibChildren = matLibNode.children()
+            print("matLibChildren")
             print(matLibChildren)
             #get asset name from material library node name
             assetName = matLibNode.name().replace("pxr_","")
 
-            #FIX PXRTEXTURES
-            #determine which are pxrtextures and add to a list
+            #FIX A BUNCH OF GARBBAGE
+            '''
+            okay I don't know why but when you reopen the shader for editing, it
+            messes up all the filepaths and also deactivates every single 
+            parameter. why. Anyway, this section activates all the parameters and 
+            corrects the filepaths. 
+            '''
+            #activate all parameters 
+            for node in matLibChildren:
+                allParms = node.parms()
+
+                activationParms = []
+                for parm in allParms:                    
+                    if("__activate__" in str(parm)):
+                        parmName = str(parm).split(" ")[1]
+                        activationParms.append(parmName)
+                    #print("activationParms:")
+                    #print(activationParms)
+                    
+                    for activationParm in activationParms:
+                        node.parm(activationParm).set(1)
+
+            #fix filepaths
+            #get pxrtextures
             pxrTexNodes = []
             for node in matLibChildren:
                 if("pxrtexture::3.0" in str(node.type())):
@@ -160,27 +166,13 @@ class EditShader():
             #fix each filepath
             for texNode in pxrTexNodes:
                 print("fixing a filepath in a pxrtexture")
-                #activate filename parameter
-                texNode.parm("__activate__filename").set(1)
                 #check that filename hasn't already been fixed
                 if(texNode.parm("filename").eval().startswith("./textures")):
                     ogFilename = texNode.parm("filename").eval()
                     newFilename = ogFilename.replace("./textures/","$JOB/assets/"+assetName+"/materials/textures/")
                     texNode.parm("filename").set(newFilename)
 
-            #FIX PXRMIXES
-            #determine which are pxrmixes and add to a list
-            pxrMixNodes = []
-            for node in matLibChildren:
-                if("pxrmix::3.0" in str(node.type())):
-                    pxrMixNodes.append(node)
-            #turn on each color parameter
-            for mixNode in pxrMixNodes:
-                mixNode.parm("__activate__color1").set(1)
-                mixNode.parm("__activate__color2").set(2)
-
-            #FIX USDUVTEXTURES
-            #determine which are usduvtextures and add to a list
+            #get usduvtextures 
             usdUvNodes = []
             for node in matLibChildren:
                 print(node.type())
@@ -200,23 +192,6 @@ class EditShader():
                 FileName = ogFilePath.split('/')[-1]
                 newFilePath = "$JOB/assets/"+ASSET_NAME+"/materials/textures/PBRMR/"+FileName
                 uvNode.parm("file").set(newFilePath)
-            
-            #FIX USDPRIMVARREADER
-            #determine which is a usdprimvarreader and add to a list
-            #yes I know there should only be one and i should write a function for this
-            #but I Do Not Have Time
-            usdPrimvarReaderNodes = []
-            for node in matLibChildren:
-                if("usdprimvarreader" in str(node.type())):
-                    print("fixing a usd primvar reader")
-                    usdPrimvarReaderNodes.append(node)
-		    
-            #activate parameters
-            for node in usdPrimvarReaderNodes:
-                #activate filename parameter
-                node.parm("__activate__signature").set(1)
-                node.parm("__activate__varname").set(1)
-        ### end patch ###
 
         objectViewer.layoutChildren()
         stage.layoutChildren()

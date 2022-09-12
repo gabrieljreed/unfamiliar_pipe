@@ -12,8 +12,14 @@ class Camera_Exporter:
         pass  
     
     def run(self):
+        
+        #Filepaths for storing the fbx for Houdini
         self.CAM_DIR = "camera"
         self.SHOTS_DIR = "/groups/unfamiliar/anim_pipeline/production/shots"
+        
+        #Filepaths for storing the fbx for Unreal
+        self.UNREAL_CAM_DIR = "unreal_camera"
+        self.UNREAL_SHOTS_DIR = ""   #<-- need to update this with the correct file path
         
         self.curr_env = umEnv.UnMaya_Environment()
         self.check_if_selected()
@@ -93,6 +99,7 @@ class Camera_Exporter:
         selected = cmds.textScrollList(scrollList, q=1, si=1)
         return selected
     
+    #Saves the selected shot to the self.shot_selection variable and triggers the export function
     def save_shot(self, selected_shot):
         self.shot_selection = selected_shot
         
@@ -199,6 +206,40 @@ class Camera_Exporter:
         
         if cmds.window('msCommentWindowID', exists=True):
             cmds.deleteUI('msCommentWindowID')
+    
+    #Exports the camera as formatted for Unreal    
+    def unreal_exporter(self):
+        #initialize
+        start_frame = cmds.playbackOptions(ast=0, q=True)
+        end_frame = cmds.playbackOptions(aet=0, q=True)
+        parent_cam = cmds.ls(selection=1)
         
+        #create new camera
+        new_cam_name = "shot_cam_" + self.shot_selection
+        new_cam= cmds.camera(ar=1.85, hfa=1.748, dfg=1, n=new_cam_name)
+        cmds.setAttr(str(new_cam[1]) + ".locatorScale", 15)
+        
+        #constrain, bake, clean up
+        cmds.parentConstraint(parent_cam, new_cam[0], mo=0)
+        cmds.bakeResults(new_cam[0], t=(start_frame, end_frame))
+        cmds.delete(cn=1)
+        
+        #export
+        ##Need to add a line here that creates the filepath where the camera will be saved     <-- IN PROGRESS (line below)
+        path = self.UNREAL_SHOTS_DIR + "/" + self.shot_selection + "/" + self.UNREAL_CAM_DIR + "/" + self.shot_selection + ".fbx"
+        #play nice with mel :)
+        ##path = path.replace("\\","/")  <-- Don't think I need these anymore....
+        ##shot_name= "shot_cam_" + self.shot_selection
+        ##path = path + "/" + shot_name + ".fbx"
+        mel.eval('FBXExport -f "'+path+'" -s')
+        
+        #delete duplicate camera
+        cmds.select(new_cam)
+        cmds.delte()
+        
+        print("done!")
+        
+        ##Todo: figure out where the Unreal fbx should be stored. Also, update the unreal exporter to include versioning and commenting as well.
+    
         
 #Camera_Exporter()

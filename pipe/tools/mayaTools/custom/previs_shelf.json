@@ -1,4 +1,6 @@
 {
+	"shelfName": "UnPrevis",
+
 	"shelfItems":[
 		{
 			"itemType":"button",
@@ -29,6 +31,16 @@
 			"double-click":"",
 			"tool":"mayaTools.UnPrevis.unMaya_FBX_CamExporter",
 			"function":"Camera_Exporter.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"frog_unreal.png",
+			"annotation":"Publis Characters and Animations to Unreal",
+			"label":"Unreal Export",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnPrevis.UnrealExporter",
+			"function":"UnrealExporter.run()"
 		}
     ]
 }

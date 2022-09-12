@@ -1,4 +1,6 @@
 {
+	"shelfName": "UnAnim",
+
 	"shelfItems":[
 		{
 			"itemType":"button",
@@ -39,6 +41,16 @@
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.reference",
 			"function":"reference.rig('frog')"
+		},
+		{
+			"itemType":"button",
+			"icon":"amoogus.png",
+			"annotation":"Reference Amoogus",
+			"label":"AMOOGUS",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('amoogus')"
 		},
 		{
 			"itemType":"button",
