@@ -7,6 +7,7 @@ Create a new json file in the shelf directory. (Copy an existing shelf and renam
 
 import sys
 import os 
+import traceback
 
 import create_shelf
 
@@ -19,7 +20,8 @@ for json_file in json_files:
         create_shelf.load_shelf(os.path.splitext(json_file)[0], json_file)
     except:
         print("Failed to load {}".format(os.path.splitext(json_file)[0]))
-        pass
+        excType, excValue, excTraceback = sys.exc_info()
+        traceback.print_exception(excType, excValue, excTraceback, limit=2, file=sys.stdout)
 
 # print("Successfully loaded shelves!")
 

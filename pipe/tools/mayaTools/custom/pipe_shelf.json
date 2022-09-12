@@ -4,7 +4,7 @@
 	"shelfItems":[
 		{
 			"itemType":"button",
-			"icon":"add.png",
+			"icon":"add.svg",
 			"annotation":"Get asset list",
 			"label":"Asset",
 			"menu":0,
@@ -14,7 +14,7 @@
 		},
 		{
 			"itemType":"button",
-			"icon":"add.png",
+			"icon":"add.svg",
 			"annotation":"Get shot list",
 			"label":"Shot",
 			"menu":0,

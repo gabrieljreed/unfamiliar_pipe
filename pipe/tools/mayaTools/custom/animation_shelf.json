@@ -82,7 +82,7 @@
 			"tool":"mayaTools.UnAnim.importProdModel",
 			"function":"mayaRun.run()"
 		},
-                {
+		{
 			"itemType":"button",
 			"icon":"publish.svg",
 			"annotation":"Export Alembic",
@@ -91,6 +91,26 @@
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.unMaya_Alembic_Exporter",
 			"function":"UnMaya_Alembic_Exporter.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"studioLibrary.png",
+			"annotation":"Studio Library",
+			"label":"StudioLibrary",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.studiolibrary.studiolibrary.main",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"discord.svg",
+			"annotation":"Launch Discord tool (still in development)",
+			"label":"Discord",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.discordTool",
+			"function":"mayaRun.run()"
 		}
     ]
 }
