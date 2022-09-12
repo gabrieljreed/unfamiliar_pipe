@@ -67,7 +67,6 @@ def load_shelf(shelfName, fileName):
 
 			command_base = "from " + str(path) + " import " + str(module) + "; shelf_item = " + str(module) + "(); shelf_item."
 			command = command_base + str(method)
-			print("command: {}".format(command))
 
 			if dcc == 0:
 				dcc = command
