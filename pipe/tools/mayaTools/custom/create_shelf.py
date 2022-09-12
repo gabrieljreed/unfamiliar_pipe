@@ -11,7 +11,7 @@ import pymel.core as pm
 import os
 import sys
 import json
-from pipe.tools.mayaTools.utilities.reload_scripts import *
+import pipe.tools.mayaTools.UnDev.unloadPackages as unload
 
 
 SHELF_DIR = os.environ.get('MAYA_SHELF_DIR')
@@ -42,7 +42,8 @@ def load_shelf(shelfName, fileName):
 	print("Loading shelf: {}".format(shelfName))
 	delete_shelf(shelfName)
 	deleteSimilarShelves(os.path.splitext(fileName)[0])
-	ReloadScripts().go()
+	unload.unloadPackages(silent=True)  # I don't think you really need this because Maya is starting up, but it doesn't hurt 
+
 
 	gShelfTopLevel = pm.mel.eval('global string $gShelfTopLevel; string $temp=$gShelfTopLevel')
 	pm.shelfLayout(shelfName, cellWidth=33, cellHeight=33, p=gShelfTopLevel)
@@ -66,6 +67,7 @@ def load_shelf(shelfName, fileName):
 
 			command_base = "from " + str(path) + " import " + str(module) + "; shelf_item = " + str(module) + "(); shelf_item."
 			command = command_base + str(method)
+			print("command: {}".format(command))
 
 			if dcc == 0:
 				dcc = command

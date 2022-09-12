@@ -1,7 +1,0 @@
-From Zach and Kaleah
-
-This folder was copied from the cenote pipe (and seems to be from the old DCC pipe as well).
-The python script that creates the shelf tools (create_shelf.py in the custom folder) imports things from this folder, but we believe it can be rewritten and most of this legacy code could
-be deleted.
-
-We didn't touch this folder at all. It is legacy code
