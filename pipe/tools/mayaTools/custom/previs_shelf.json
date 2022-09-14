@@ -35,7 +35,7 @@
 		{
 			"itemType":"button",
 			"icon":"frog_unreal.png",
-			"annotation":"Publis Characters and Animations to Unreal",
+			"annotation":"Publish Characters and Animations to Unreal Pipe",
 			"label":"Unreal Export",
 			"menu":0,
 			"double-click":"",

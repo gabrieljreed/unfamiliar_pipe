@@ -1,0 +1,16 @@
+{
+	"shelfName": "UnRig",
+
+	"shelfItems":[
+		{
+			"itemType":"button",
+			"icon":"load.png",
+			"annotation":"Publish Rig",
+			"label":"Rig Publish",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnRig.rigPublish",
+			"function":"mayaRun.run()"
+		}
+    ]
+}

@@ -54,6 +54,16 @@
 		},
 		{
 			"itemType":"button",
+			"icon":"rollback.svg",
+			"annotation":"Reference previous version of rig",
+			"label":"Previous rig",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.getPreviousRig",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
 			"icon":"y.svg",
 			"annotation":"Import Layout",
 			"label":"LAYOUT",
@@ -104,7 +114,7 @@
 		},
 		{
 			"itemType":"button",
-			"icon":"discord.svg",
+			"icon":"MLP_Discord.png",
 			"annotation":"Launch Discord tool (still in development)",
 			"label":"Discord",
 			"menu":0,
