@@ -2,6 +2,11 @@
  GT Maya to Discord
  Send images and videos (playblasts) from Maya to Discord using a Discord Webhook to bridge the two programs.
 
+ Supported channels: 
+    - Modeling
+    - Rigging
+    - Animation
+
 """
 
 try:
@@ -41,6 +46,7 @@ import os
 from json import dumps
 from json import loads
 
+import http
 # Logging Setup
 logging.basicConfig()
 logger = logging.getLogger("gt_maya_to_discord")
@@ -1341,7 +1347,6 @@ def discord_post_message(username, message, webhook_url):
         }
 
         host, path = parse_discord_api(webhook_url)
-        print("I am here")
         connection = http.client.HTTPSConnection(host)
         connection.request('POST', path, headers={'Content-Type': 'application/json; charset=UTF-8',
                                                   'User-Agent': 'gt_maya_to_discord/' + str(script_version)},
@@ -1539,6 +1544,7 @@ def update_discord_webhook_validity(webhook_url):
     success_codes = [200, 201, 202, 203, 204, 205, 206]
     if python_version == 3:
         try:
+            import http
             host, path = parse_discord_api(webhook_url)
             connection = http.client.HTTPSConnection(host)
             connection.request('GET', path, headers={'Content-Type': 'application/json; charset=UTF-8',
@@ -1589,7 +1595,10 @@ def discord_get_webhook_name(webhook_url):
     if python_version == 3:
         try:
             host, path = parse_discord_api(webhook_url)
-            connection = http.client.HTTPSConnection(host)
+            import http 
+            import ssl
+            ssl._create_default_https_context = ssl._create_unverified_context
+            connection = http.client.HTTPSConnection(host)  # This is where it errors out 
             connection.request('GET', path, headers={'Content-Type': 'application/json; charset=UTF-8',
                                                      'User-Agent': 'gt_maya_to_discord/' + str(script_version)})
             response = connection.getresponse()
@@ -1691,4 +1700,4 @@ if __name__ == '__main__':
 
 class mayaRun:
     def run(self):
-        build_gui_help_maya_to_discord()
+        build_gui_maya_to_discord()
