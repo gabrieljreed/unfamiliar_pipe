@@ -17,14 +17,21 @@ class Camera_Exporter:
         self.CAM_DIR = "camera"
         self.SHOTS_DIR = "/groups/unfamiliar/anim_pipeline/production/shots"
         
-        #Filepaths for storing the fbx for Unreal
-        self.UNREAL_CAM_DIR = "unreal_camera"
-        self.UNREAL_SHOTS_DIR = ""   #<-- need to update this with the correct file path
+        #Filepaths for storing the fbx for Unreal   
+        self.UNREAL_EXPORTS_FOLDER = self.get_fileName() + "_ExportsUE"
+        self.PREVIS_SEQUENCE_FILEPATH = "/groups/unfamiliar/previs/SHOTS"
+        
         
         self.curr_env = umEnv.UnMaya_Environment()
         self.check_if_selected()
     
-    #Checks if here is something selected in the scene. If there is, it continues to the shot_select_gui
+    def get_fileName(self):
+        fullNamePath = cmds.file( q=1, sn = 1)
+        fileName_withExt = fullNamePath.split('/')[-1]
+        fileName = fileName_withExt.split('.')[0]
+        return fileName
+    
+    #Checks if here is something selected in the scene. If there is, it continues to the shot_select_gui, making sure that the shotCam's main layer is selected
     def check_if_selected(self):
         curr_selection = cmds.ls(selection=True)
         if len(curr_selection) == 0:
@@ -32,8 +39,15 @@ class Camera_Exporter:
             if confirm == "Ok":
                 pass
         else:
+            shotCam_name = curr_selection[0].split(':')[0]
+            shotCam_main = shotCam_name + ':Main'            
+            self.selected_cam = [shotCam_main]
+            cmds.select(shotCam_main)
             self.shot_select_gui()
             
+
+###############################################################
+###                  SELECT SHOT FUNCTIONS                  ###          
     
     #GUI to select which shot you are exporting the camera from    
     def shot_select_gui(self):
@@ -61,6 +75,10 @@ class Camera_Exporter:
         cmds.button(label="Select Current Shot", c=lambda x: self.select_current_shot(selection))
         cmds.button(label="Next", c=lambda x: self.save_shot(self.getSelected(selection)[0]))
         cmds.setParent("..")
+
+        cmds.columnLayout(adjustableColumn=True, columnAlign='center')
+        cmds.checkBox( 'unreal_shift', label='Shift Unreal camera animations to zero', value=True)
+        cmds.setParent('..')
     
     #Supports the Shot select gui by implementing a search function
     def search(self):
@@ -84,7 +102,6 @@ class Camera_Exporter:
         fullNamePath = cmds.file( q =1, sn = 1)
         dirPath = os.path.dirname(fullNamePath)
         shotName = dirPath.split('/')[-1]
-        print(fullNamePath, dirPath, shotName)
        
         if shotName in self.shot_list:
             #Sets the selection to the currently opened shot
@@ -103,71 +120,351 @@ class Camera_Exporter:
     def save_shot(self, selected_shot):
         self.shot_selection = selected_shot
         
+        self.unreal_shift = cmds.checkBox('unreal_shift', q=True, v=True)
+
         if cmds.window("ms_selectShot_GUI", exists=True):
                 cmds.deleteUI("ms_selectShot_GUI")
-                
-        self.trigger_exportFBX()
-    
-    #Creates the fbx_filepath, checks if the camera file exists in the shot directory, makes it if not. Triggers versioning and comment_gui            
-    def trigger_exportFBX(self):
         
-        self.fbx_filepath = self.SHOTS_DIR + "/" + self.shot_selection + "/" + self.CAM_DIR 
-        
-        if not self.dir_exists(self.fbx_filepath):
-            os.mkdir(self.fbx_filepath)
-        
-        command = self.get_fbx_command(self.fbx_filepath)    
-        self.el = umEl.UnMaya_Element(self.fbx_filepath)
-        self.version_fbx(command)
-        self.comment_gui()
+                       
+        self.set_houdini_filepath(True)            
+        self.set_unreal_filepath(True)
+        self.get_auto_frameRange() 
 
+
+###############################################################
+###                  FRAME RANGE FUNCTIONS                  ###
+    
+    
+    #Works with the camera sequencer to find the frame range of the camera's shot    
+    def get_auto_frameRange(self):
+                
+        sequence = cmds.listConnections("sequencer1", type="shot")
+        for curr_shot in sequence:
+            shot_name = cmds.shot(curr_shot, q=True, shotName=True)
+            if shot_name in self.shot_selection:
+                self.cam_shot = curr_shot
+                break
+            else:
+                self.cam_shot = None
+                
+        if self.cam_shot != None:
+            self.shot_start = int(cmds.shot(self.cam_shot, q=True, startTime=True))
+            self.shot_end = int(cmds.shot(self.cam_shot, q=True, endTime=True))
+            self.comment_gui()
+        else:
+            self.get_frameRange_gui()
+        
+    #GUI: Prompts for the first and last frame to export
+    def get_frameRange_gui(self):
+        # Make a new default window
+        windowID = 'msFrameRangeWindowID'
+        if cmds.window(windowID, exists=True):
+            cmds.deleteUI(windowID)
+
+        self.window = cmds.window(windowID, title="Select Frame Range", sizeable=False, iconName='Short Name',
+                                  resizeToFitChildren=True)
+
+        cmds.columnLayout( adjustableColumn=True )
+        cmds.text( label='Unable to automatically find the shot\'s framerange. Please enter it manually.')
+
+        cmds.rowColumnLayout(nr=5)
+
+        # StartFrame and EndFram boxes
+        cmds.rowLayout(nc=4)
+        cmds.textFieldGrp('startFrame', label='Start Frame:')
+        cmds.textFieldGrp('endFrame', label='End Frame:')
+        cmds.setParent('..')
+        cmds.separator(h=30, vis=True)
+
+        # Create a Playback range button
+        cmds.rowLayout(nc=1)
+        cmds.button(label='Next', command=lambda x: self.get_manual_frameRange())
+        cmds.setParent('..')
+        cmds.showWindow(self.window)
+
+    #Saves the frame range from the gui  
+    def get_manual_frameRange(self):
+        
+        self.shot_start = cmds.textFieldGrp('startFrame', q=True, text=True)
+        self.shot_end = cmds.textFieldGrp('endFrame', q=True, text=True)
+        
+        error_message = ""
+        if not self.shot_start or not self.shot_end:
+            error_message = "Entries can not be empty"
+        elif not self.shot_start.isdigit():
+            if self.shot_start[0] == '-' and self.shot_start[1:].isdigit():
+                pass
+            else:
+                error_message = "Entries must be integers"
+        elif not self.shot_end.isdigit():
+            if self.shot_end[0] == '-' and self.shot_end[1:].isdigit():
+                pass
+            else:
+                error_message = "Entries must be integers"
+        elif self.shot_end < self.shot_start:
+            error_message = "End frame must be greater than the start frame"
+        
+        if error_message != "":
+            confirm = cmds.confirmDialog ( title='WARNING', message=error_message, button=['Ok'], defaultButton='Ok', dismissString='Other' )
+            if confirm == "Ok":
+                pass
+        else:
+            if cmds.window('msFrameRangeWindowID', exists=True):
+                cmds.deleteUI('msFrameRangeWindowID')
+            
+            self.comment_gui()
+
+
+###############################################################
+###                 EXPORT CAM FUNCTIONS                    ###         
+    
+        
     #Checks if a dir exists, returns True or False 
     def dir_exists(self, dir_path):
         my_file = Path(dir_path)
-        return my_file.is_dir()
-     
-    #Gets the commands needed for an fbx export. Sets the file name. Updates the self.fbx_filepath with file name       
-    def get_fbx_command(self, file_path):
-        save_name = file_path + "/camera_main" 
-        command = "FBXExport -f \"" + save_name + "\" -s"
-        self.fbx_filepath = save_name + ".fbx"
-        return command 
+        return my_file.is_dir() 
+
+    #Initiates the exporter for houdini and unreal, as well as the comment gui
+    def trigger_exports(self):
+        self.exportFBX_houdini()
+        self.exportFBX_unreal()
+
+    # Sets the self.houdini_filepath variable and creates the camera directory if it does not already exist
+    def set_houdini_filepath(self, withFile):
+        filepath = self.SHOTS_DIR + "/" + self.shot_selection + "/" + self.CAM_DIR
+
+        if not self.dir_exists(filepath):
+            os.mkdir(filepath)
+            os.chmod(filepath, mode=0o777)
+
+        if withFile:
+            self.houdini_filepath_noExt = filepath + "/camera_main"
+            self.houdini_filepath = filepath + "/camera_main.fbx"
+        else:
+            self.houdini_filepath = filepath
+
+    # Sets the self.unreal_filepath variablet
+    def set_unreal_filepath(self, withFile):
+        filepath = self.find_shot_file()
+                
+        if withFile:
+            self.unreal_filepath_noExt = filepath + "/camera_main"
+            self.unreal_filepath = self.unreal_filepath_noExt + ".fbx"
+        else:
+            self.unreal_filepath = filepath
     
-    #Exports the FBX and versions it 
-    def version_fbx(self, command):
-        #Temporarily rename the camera for exportation
-        ##old_cam_name = curr_selection = cmds.ls(selection=True)[0]
-        ##cmds.rename(cmds.ls(selection=True)[0], self.shot_selection)
-        #Export FBX to _main.fbx
+    # Takes the selected shot and finds the subsequence folder under previs 
+    def find_shot_file(self):
+        print("Selected Shot:", self.shot_selection) 
+        shot_sections = self.shot_selection.split('_')
+        
+        sequence_list = self.curr_env.get_shot_list_undef(self.PREVIS_SEQUENCE_FILEPATH)
+        if "test" not in shot_sections:
+            sequence_list = sorted(sequence_list)
+            sequence_list = sequence_list[1:-1]
+            
+            folder_index = ord(shot_sections[0]) - 65
+            sequence_dir = sequence_list[folder_index]
+            curr_filepath = self.PREVIS_SEQUENCE_FILEPATH + "/" + sequence_dir
+            
+            subsequence_list = self.curr_env.get_shot_list_undef(curr_filepath)
+            subsequence_list = sorted(subsequence_list)
+            self.subsequence = ""
+            for element in subsequence_list:
+                element_dict = self.split_subsequence_name(element)
+                if element_dict["SEQ"] != "none":
+                    if shot_sections[1] >= element_dict["START"]:
+                        if shot_sections[1] <= element_dict["END"]:
+                            self.subsequence = element
+                            break
+            
+            print("sub:", self.subsequence)
+            
+            #inserts the export folder directory into the path
+            curr_filepath = curr_filepath + "/" + self.subsequence + "/" + self.UNREAL_EXPORTS_FOLDER
+            if not self.dir_exists(curr_filepath):
+                os.mkdir(curr_filepath)
+                os.chmod(curr_filepath, mode=0o777)
+            
+            #inserts the "camera" directory into the path
+            curr_filepath = curr_filepath + "/" + self.CAM_DIR
+            if not self.dir_exists(curr_filepath):
+                os.mkdir(curr_filepath)
+                os.chmod(curr_filepath, mode=0o777)            
+
+            #inserts the specific shot directory into the path
+            curr_filepath = curr_filepath + "/" + self.shot_selection 
+            if not self.dir_exists(curr_filepath):
+                os.mkdir(curr_filepath)
+                os.chmod(curr_filepath, mode=0o777)            
+
+    
+            return curr_filepath
+    
+    # Takes the subsequence and splits into into a dictionary including the sequence, start shot and end shot
+    def split_subsequence_name(self, subsequence):
+        dict = {}
+         
+        temp = subsequence.split('_')
+        if len(temp) < 2:
+            dict["SEQ"] = "none"
+            dict["START"] = "none"
+            dict["END"] = "none"
+        else:
+            dict["SEQ"] = temp[0]
+            temp = temp[1].split('-')
+            dict["START"] = temp[0]
+            dict["END"] = temp[1]
+        
+        return dict          
+    
+    # Duplicates the selected cam including keyframes
+    def duplicate_cam(self):
+
+        camera_name = self.shot_selection
+        
+        ##orig_cam = cmds.ls(selection=True)[0]
+        orig_cam = self.selected_cam[0]
+        full_origCam = [orig_cam]
+        full_origCam.extend(cmds.listRelatives(orig_cam, allDescendents=True))
+        
+        cmds.duplicate(orig_cam, name=camera_name)
+        
+        new_cam = cmds.ls(selection=True)[0]
+        self.new_houdini_cam = new_cam
+        full_newCam = [new_cam]
+        full_newCam.extend(cmds.listRelatives(new_cam, allDescendents=True))
+
+        index = 0
+        for cam_piece in full_origCam:
+            if cmds.keyframe(cam_piece, query=True, time=(self.shot_start, self.shot_end), keyframeCount=True) > 0:   
+                self.copy_keyframes(cam_piece, full_newCam[index])
+            index += 1
+    
+    #copies the keyframes from one obj to another
+    def copy_keyframes(self, old_cam, new_cam):
+        
+        start_time = int(self.shot_start)
+        end_time = int(self.shot_end)
+                
+        cmds.copyKey( old_cam, time=(start_time,end_time) )
+        
+        offset = start_time * -1
+        cmds.pasteKey( new_cam, timeOffset=offset)
+    
+    
+    #Generates the camera for houdini element file, exports with the proper settings for houdini, and triggers the versioning function    
+    def exportFBX_houdini(self):
+        self.houdini_el = umEl.UnMaya_Element(self.houdini_filepath)
+        command = "FBXExport -f \"" + self.houdini_filepath_noExt + "\" -s"
+        
+        #Duplicate camera, adjust keyframes in shot to start at 0, leave new cam selected
+        self.duplicate_cam() 
+        #new_cam = cmds.ls(selection=True)[0]
+        new_cam = self.new_houdini_cam
+        
         mel.eval(command)
-        #Rename camera back to original name
-        ##cmds.rename(cmds.ls(selection=True)[0], old_cam_name)
+        os.chmod(self.houdini_filepath, mode=0o777)
+        
+        #delete duplicate camera
+        cmds.select(new_cam)
+        cmds.delete()
+        
+        #version houdini fbx file
+        self.version(self.houdini_el)
+
+    #returns the name of the camera's base ShotCam layer
+    def get_shotCam(self, cam_selection):
+        if "ShotCam_000" in cam_selection and "Shape" not in cam_selection:
+            return cam_selection
+        else:
+            descendents = cmds.listRelatives(cam_selection, allDescendents=True)
+            for sub in descendents:
+                if "ShotCam_000" in sub and "Shape" not in sub:
+                    return sub
+        
+    #Generates the camera for unreal element file, exports with the proper settings for houdini, and triggers the versioning function  
+    def exportFBX_unreal(self): 
+        self.unreal_el = umEl.UnMaya_Element(self.unreal_filepath)
+
+        #initialize
+        if self.unreal_shift:
+            start_frame = self.shot_start
+            end_frame = self.shot_end
+        else:    
+            start_frame = cmds.playbackOptions(ast=0, q=True)
+            end_frame = cmds.playbackOptions(aet=0, q=True)
+        parent_cam = self.get_shotCam(self.selected_cam)
+        ##parent_cam = cmds.ls(selection=1)
+        
+        #create new camera
+        new_cam_name = "shot_cam_" + self.shot_selection
+        new_unreal_cam= cmds.camera(ar=1.85, hfa=1.748, dfg=1, n=new_cam_name)
+        cmds.setAttr(str(new_unreal_cam[1]) + ".locatorScale", 15)
+        
+        #constrain, bake, clean up
+        cmds.parentConstraint(parent_cam, new_unreal_cam[0], mo=0)
+        cmds.bakeResults(new_unreal_cam[0], t=(start_frame, end_frame))
+        cmds.delete(cn=1)
+        
+        if self.unreal_shift:
+            time_shift = int(self.shot_start) * -1
+            cmds.keyframe(new_unreal_cam, edit=True,relative=True,timeChange=time_shift,time=(start_frame,end_frame))
+
+        ##mel.eval('FBXExport -f "'+path+'" -s')
+        mel.eval('FBXExport -f "'+self.unreal_filepath+'" -s')
+        os.chmod(self.unreal_filepath, mode=0o777)
+
+        #delete duplicate camera
+        cmds.select(new_unreal_cam)
+        cmds.delete()
+
+        #version unreal fbx file
+        self.version(self.unreal_el)
+
+
+
+###############################################################
+###                 VERSION CAM FUNCTIONS                   ### 
+
+
+    def version(self, element):
         
         #Get new version number
-        self.ver_num = self.el.get_latest_version() + 1 
+        self.ver_num = element.get_latest_version() + 1 
         dir_name = ".v" + f"{self.ver_num:04}"
         #Make hidden directory with version number
-        new_dir_path = os.path.join(self.curr_env.get_file_dir(self.el.filepath), dir_name)
+        new_dir_path = os.path.join(self.curr_env.get_file_dir(element.filepath), dir_name) 
         os.mkdir(new_dir_path)
         #Copy FBX into the new directory and rename it
-        new_file_path = new_dir_path + "/" + self.el.get_file_parent_name() + self.el.get_file_extension()
-        shutil.copy(self.el.filepath, new_file_path)
-        
-            
+        ##new_file_path = new_dir_path + "/" + element.get_file_parent_name() + element.get_file_extension()
+        new_file_path = self.get_versioned_filename(new_dir_path, element)
+        shutil.copy(element.filepath, new_file_path)
+        #Triggers the element file to update (must be run after the comment_gui, or else self.comment will not be set)
+        self.update_element_file(element)
+
+    def get_versioned_filename(self, new_dir_path, element):
+        if element.get_file_parent_name() == "":
+            return new_dir_path + "/" + self.shot_selection + element.get_file_extension()
+        else:
+            return new_dir_path + "/" + element.get_file_parent_name() + element.get_file_extension()
+
     #updates the element file with the comment
-    def update_element_file(self):
+    def update_element_file(self, element):
         #Adds new publish log to list of publishes
-        self.comment = "v" + str(self.ver_num) + ": " + self.comment
-        self.el.add_publish_log(self.comment)
+        comment = "v" + str(self.ver_num) + ": " + self.comment_text
+        element.add_publish_log(comment)
         #Set latest version
-        self.el.set_latest_version(self.ver_num)
+        element.set_latest_version(self.ver_num)
         #Write the .element file to disk
-        self.el.write_element_file()
-    
+        element.write_element_file()
+     
     #GUI: Prompts the user to imput a comment for the current export
     def comment_gui(self):
+        element = umEl.UnMaya_Element(self.houdini_filepath)
+        
         #Make list of past comments for the gui
-        publishes = self.el.get_publishes_list()
+        publishes = element.get_publishes_list()
         if len(publishes) > 10:
             publishes = publishes[-10:]
         publishes_list = []
@@ -199,47 +496,13 @@ class Camera_Exporter:
         cmds.setParent('..')
         cmds.showWindow(self.window)  
                 
-    #Gets comment, updates the .element file with the comment    
+    #Gets comment and triggers the exports
     def comment_results(self):
-        self.comment = cmds.textFieldGrp('comment', q=True, text=True)
-        self.update_element_file()
+        self.comment_text = cmds.textFieldGrp('comment', q=True, text=True)
         
         if cmds.window('msCommentWindowID', exists=True):
             cmds.deleteUI('msCommentWindowID')
-    
-    #Exports the camera as formatted for Unreal    
-    def unreal_exporter(self):
-        #initialize
-        start_frame = cmds.playbackOptions(ast=0, q=True)
-        end_frame = cmds.playbackOptions(aet=0, q=True)
-        parent_cam = cmds.ls(selection=1)
-        
-        #create new camera
-        new_cam_name = "shot_cam_" + self.shot_selection
-        new_cam= cmds.camera(ar=1.85, hfa=1.748, dfg=1, n=new_cam_name)
-        cmds.setAttr(str(new_cam[1]) + ".locatorScale", 15)
-        
-        #constrain, bake, clean up
-        cmds.parentConstraint(parent_cam, new_cam[0], mo=0)
-        cmds.bakeResults(new_cam[0], t=(start_frame, end_frame))
-        cmds.delete(cn=1)
-        
-        #export
-        ##Need to add a line here that creates the filepath where the camera will be saved     <-- IN PROGRESS (line below)
-        path = self.UNREAL_SHOTS_DIR + "/" + self.shot_selection + "/" + self.UNREAL_CAM_DIR + "/" + self.shot_selection + ".fbx"
-        #play nice with mel :)
-        ##path = path.replace("\\","/")  <-- Don't think I need these anymore....
-        ##shot_name= "shot_cam_" + self.shot_selection
-        ##path = path + "/" + shot_name + ".fbx"
-        mel.eval('FBXExport -f "'+path+'" -s')
-        
-        #delete duplicate camera
-        cmds.select(new_cam)
-        cmds.delte()
-        
-        print("done!")
-        
-        ##Todo: figure out where the Unreal fbx should be stored. Also, update the unreal exporter to include versioning and commenting as well.
-    
+            
+        self.trigger_exports()            
         
 #Camera_Exporter()

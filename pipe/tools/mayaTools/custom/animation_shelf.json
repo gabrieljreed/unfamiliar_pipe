@@ -60,7 +60,7 @@
 			"menu":0,
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.getPreviousRig",
-			"function":"mayaRun.run()"
+			"function":"GetPreviousRigUI.getPreviousRig()"
 		},
 		{
 			"itemType":"button",
@@ -94,6 +94,26 @@
 		},
 		{
 			"itemType":"button",
+			"icon":"y.svg",
+			"annotation":"Import Production Model with Reference",
+			"label":"PROD REF",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.importProdModel",
+			"function":"mayaRun.runWithReference()"
+		},
+		{
+			"itemType":"button",
+			"icon":"rollback.svg",
+			"annotation":"Refresh Production Model (still in development)",
+			"label":"REF",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.importProdModel",
+			"function":"mayaRun.refresh()"
+		},
+		{
+			"itemType":"button",
 			"icon":"publish.svg",
 			"annotation":"Export Alembic",
 			"label":"ExportAlembic",
@@ -120,6 +140,26 @@
 			"menu":0,
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.discordTool",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"MLP_Discord.png",
+			"annotation":"Launch Discord tool (still in development)",
+			"label":"Discord",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.discordTool",
+			"function":"mayaRun.runBetter()"
+		},
+		{
+			"itemType":"button",
+			"icon":"animBot.png",
+			"annotation":"Launch animBot plugin",
+			"label":"AnimBot",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.loadAnimbot",
 			"function":"mayaRun.run()"
 		}
     ]

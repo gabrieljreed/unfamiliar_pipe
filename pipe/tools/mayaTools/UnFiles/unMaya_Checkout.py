@@ -74,7 +74,7 @@ class ShotCheckout:
             print("Selected shot: ", selected_shot[0])
             #Get the .mb directory
             mb_dir = self.curr_env.get_mb_dir(selected_shot[0])
-            #Access the respective .eleent file
+            #Access the respective .element file
             el = umEl.UnMaya_Element(mb_dir)
             #Check if the .mb file is already assigned
             if (el.is_assigned() == True):

@@ -13,173 +13,204 @@ RIG_PATH = "/groups/unfamiliar/anim_pipeline/production/rigs"
 detailsWidget = None
 
 
-def getPreviousRig():
-    rigs = os.listdir(RIG_PATH)
-    # Ask user what rig they want to import
-    dialog = QDialog()
-    dialog.setWindowTitle("Reference previous version of Rig")
-    dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
-    dialog.setWindowFlags(Qt.WindowCloseButtonHint)
-    dialog.setWindowFlags(Qt.WindowMinimizeButtonHint)
-    dialog.setWindowFlags(Qt.WindowMaximizeButtonHint)
-    dialog.setWindowFlags(Qt.WindowContextHelpButtonHint)
-    dialog.setWindowFlags(Qt.WindowFullscreenButtonHint)
-    dialog.setWindowFlags(Qt.WindowShadeButtonHint)
-    dialog.setWindowFlags(Qt.WindowTransparentForInput)
-    dialog.setWindowFlags(Qt.WindowOverridesSystemGestures)
-    dialog.setWindowFlags(Qt.WindowDoesNotAcceptFocus)
+class GetPreviousRigUI:
+    def __init__(self):
+        self.detailsWidget = None
+        self.versionListWidget = None
+        self.hBox = None
+        self.versionLabel = None
+        self.dateLabel = None
+        self.timeLabel = None
+        self.descriptionLabel = None
 
-    dialog.resize(400, 100)
+        self.detailsWidget = QWidget()
+        self.detailsWidget.setObjectName("detailsWidget")
+        self.detailsWidget.setMinimumWidth(250)
+        detailsLayout = QVBoxLayout()
+        self.detailsWidget.setLayout(detailsLayout)
 
-    layout = QVBoxLayout()
-    dialog.setLayout(layout)
+        self.versionLabel = QLabel()
+        self.versionLabel.setObjectName("versionLabel")
+        detailsLayout.addWidget(self.versionLabel)
 
-    label = QLabel("Select a rig to reference")
-    layout.addWidget(label)
+        self.dateLabel = QLabel()
+        self.dateLabel.setObjectName("dateLabel")
+        detailsLayout.addWidget(self.dateLabel)
 
-    combo = QComboBox()
-    combo.addItems(rigs)
-    layout.addWidget(combo)
+        self.timeLabel = QLabel()
+        self.timeLabel.setObjectName("timeLabel")
+        detailsLayout.addWidget(self.timeLabel)
 
-    button = QPushButton("Select")
-    layout.addWidget(button)
+        self.descriptionLabel = QLabel()
+        self.descriptionLabel.setObjectName("descriptionLabel")
+        detailsLayout.addWidget(self.descriptionLabel)
 
-    button.clicked.connect(dialog.accept)
+    def getPreviousRig(self):
+        rigs = os.listdir(RIG_PATH)
+        # Ask user what rig they want to import
+        dialog = QDialog()
+        dialog.setWindowTitle("Reference previous version of Rig")
+        dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
+        dialog.setWindowFlags(Qt.WindowCloseButtonHint)
+        dialog.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        dialog.setWindowFlags(Qt.WindowMaximizeButtonHint)
+        dialog.setWindowFlags(Qt.WindowContextHelpButtonHint)
+        dialog.setWindowFlags(Qt.WindowFullscreenButtonHint)
+        dialog.setWindowFlags(Qt.WindowShadeButtonHint)
+        dialog.setWindowFlags(Qt.WindowTransparentForInput)
+        dialog.setWindowFlags(Qt.WindowOverridesSystemGestures)
+        dialog.setWindowFlags(Qt.WindowDoesNotAcceptFocus)
 
-    if not dialog.exec_():
-        return
+        dialog.resize(400, 100)
 
-    rig = combo.currentText()
-    versionsPath = os.path.join(RIG_PATH, rig, "versions")
+        layout = QVBoxLayout()
+        dialog.setLayout(layout)
 
-    if not os.path.isdir(versionsPath):
-        QMessageBox.warning(None, "No previous versions", "No previous versions of this rig exist")
-        return
-    
-    versions = os.listdir(versionsPath)
-    versions.sort(reverse=True)
-    
-    # Read in the versions.txt file if it exists
-    versionsInfo = None
-    if os.path.exists(os.path.join(versionsPath, "version_list.txt")):
-        with open(os.path.join(versionsPath, "version_list.txt"), "r") as f:
-            versionsInfo = f.read().splitlines()
+        label = QLabel("Select a rig to reference")
+        layout.addWidget(label)
 
-    # Remove any .txt files from versions 
-    for version in versions:
-        if version.endswith(".txt"):
-            versions.remove(version)
+        combo = QComboBox()
+        combo.addItems(rigs)
+        layout.addWidget(combo)
 
-    # Launch dialog to select version
-    dialog = QDialog()
-    dialog.setWindowTitle("Reference previous version of Rig")
-    dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
-    dialog.setWindowFlags(Qt.WindowCloseButtonHint)
-    dialog.setWindowFlags(Qt.WindowMinimizeButtonHint)
-    dialog.setWindowFlags(Qt.WindowMaximizeButtonHint)
-    dialog.setWindowFlags(Qt.WindowContextHelpButtonHint)
-    dialog.setWindowFlags(Qt.WindowFullscreenButtonHint)
-    dialog.setWindowFlags(Qt.WindowShadeButtonHint)
-    dialog.setWindowFlags(Qt.WindowTransparentForInput)
-    dialog.setWindowFlags(Qt.WindowOverridesSystemGestures)
-    dialog.setWindowFlags(Qt.WindowDoesNotAcceptFocus)
+        button = QPushButton("Select")
+        layout.addWidget(button)
 
-    dialog.resize(400, 100)
+        button.clicked.connect(dialog.accept)
 
-    layout = QVBoxLayout()
-    dialog.setLayout(layout)
+        if not dialog.exec_():
+            return
 
-    label = QLabel("Select a version to reference")
-    label.setAlignment(Qt.AlignCenter)
-    layout.addWidget(label)
+        rig = combo.currentText()
+        versionsPath = os.path.join(RIG_PATH, rig, "versions")
 
-    hBox = QHBoxLayout()
-    layout.addLayout(hBox)
+        if not os.path.isdir(versionsPath):
+            QMessageBox.warning(None, "No previous versions", "No previous versions of this rig exist")
+            return
+        
+        versions = os.listdir(versionsPath)
+        versions.sort(reverse=True)
+        
+        # Read in the versions.txt file if it exists
+        versionsInfo = None
+        if os.path.exists(os.path.join(versionsPath, "version_list.txt")):
+            with open(os.path.join(versionsPath, "version_list.txt"), "r") as f:
+                versionsInfo = f.read().splitlines()
 
-    global detailsWidget
+        # Remove any .txt files from versions 
+        for version in versions:
+            if version.endswith(".txt"):
+                versions.remove(version)
 
-    versionListWidget = QListWidget()
-    versionListWidget.itemClicked.connect(partial(setupVersionDetails, versionListWidget, versionsInfo))
-    hBox.addWidget(versionListWidget)
-    for version in versions:
-        versionListWidget.addItem(version)
-    
-    if versionsInfo:
-        setupVersionDetails(versionListWidget, versionsInfo)
-        hBox.addWidget(detailsWidget)
+        # Launch dialog to select version
+        dialog = QDialog()
+        dialog.setWindowTitle("Reference previous version of Rig")
+        dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
+        dialog.setWindowFlags(Qt.WindowCloseButtonHint)
+        dialog.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        dialog.setWindowFlags(Qt.WindowMaximizeButtonHint)
+        dialog.setWindowFlags(Qt.WindowContextHelpButtonHint)
+        dialog.setWindowFlags(Qt.WindowFullscreenButtonHint)
+        dialog.setWindowFlags(Qt.WindowShadeButtonHint)
+        dialog.setWindowFlags(Qt.WindowTransparentForInput)
+        dialog.setWindowFlags(Qt.WindowOverridesSystemGestures)
+        dialog.setWindowFlags(Qt.WindowDoesNotAcceptFocus)
 
-    button = QPushButton("Reference")
-    layout.addWidget(button)
+        dialog.resize(400, 100)
 
-    button.clicked.connect(dialog.accept)
+        layout = QVBoxLayout()
+        dialog.setLayout(layout)
 
-    if not dialog.exec_():
-        return
+        label = QLabel("Select a version to reference")
+        label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(label)
 
-    version = versionListWidget.currentItem().text()
-    versionPath = os.path.join(versionsPath, version)
-    if not os.path.isfile(versionPath):
-        QMessageBox.warning(None, "Unable to reference", "Unable to reference version {}".format(version))
-        return
+        self.hBox = QHBoxLayout()
+        layout.addLayout(self.hBox)
 
-    mc.file(versionPath, r=True, namespace=rig)
+        self.versionListWidget = QListWidget()
+        # self.versionListWidget.itemClicked.connect(partial(self.setupVersionDetails, versionsInfo))
+        self.versionListWidget.itemClicked.connect(partial(self.updateUI, versionsInfo))
+        self.hBox.addWidget(self.versionListWidget)
+        for version in versions:
+            self.versionListWidget.addItem(version)
+        
+        if versionsInfo:
+            # self.setupVersionDetails(self.versionListWidget, versionsInfo)
+            self.updateUI(versionsInfo)
+            self.hBox.addWidget(self.detailsWidget)
 
+        button = QPushButton("Reference")
+        layout.addWidget(button)
 
-def setupVersionDetails(versionListWidget, versionsInfo, *args):
-    global detailsWidget
+        button.clicked.connect(dialog.accept)
 
-    detailsWidget = QWidget()
-    detailsWidget.setFixedWidth(175)
-    detailsLayout = QVBoxLayout()
-    detailsWidget.setLayout(detailsLayout)
+        if not dialog.exec_():
+            return
 
-    if versionListWidget.currentItem() is None or versionsInfo is None:
-        label = QLabel("Select a version to see details")
-        detailsLayout.addWidget(label)
-        return detailsWidget
+        version = self.versionListWidget.currentItem().text()
+        versionPath = os.path.join(versionsPath, version)
+        if not os.path.isfile(versionPath):
+            QMessageBox.warning(None, "Unable to reference", "Unable to reference version {}".format(version))
+            return
 
-    print("Setup version details")
-
-    currentInfo = None
-    for info in versionsInfo:
-        split = info.split(" ")
-        # Remove any empty strings or "-"s
-        split = [i for i in split if i != "" and i != "-"]
-        # Search for the current version
-        if split[0] in versionListWidget.currentItem().text():
-            currentInfo = split
-            break
-
-    if currentInfo is None:
-        label = QLabel("No version info found")
-        detailsLayout.addWidget(label)
-        return detailsWidget
-
-    version = currentInfo[0]
-    versionLabel = QLabel()
-    versionLabel.setText(version)
-    detailsLayout.addWidget(versionLabel)
-
-    date = currentInfo[1]
-    dateLabel = QLabel()
-    dateLabel.setText(date)
-    detailsLayout.addWidget(dateLabel)
-
-    time = currentInfo[2]
-    timeLabel = QLabel()
-    timeLabel.setText(time)
-    detailsLayout.addWidget(timeLabel)
-
-    description = " ".join(currentInfo[3:])
-    descriptionLabel = QLabel()
-    descriptionLabel.setText(description)
-    detailsLayout.addWidget(descriptionLabel)
-
-    print("Finished setting up version details")
-
-    return detailsWidget
+        mc.file(versionPath, r=True, namespace=rig)
 
 
-class mayaRun:
-    def run(self):
-        getPreviousRig()
+    def setupVersionDetails(self, *args):
+        self.detailsWidget = QWidget()
+        self.detailsWidget.setObjectName("detailsWidget")
+        self.detailsWidget.setFixedWidth(175)
+        detailsLayout = QVBoxLayout()
+        self.detailsWidget.setLayout(detailsLayout)
+
+        self.versionLabel = QLabel()
+        self.versionLabel.setObjectName("versionLabel")
+        detailsLayout.addWidget(self.versionLabel)
+
+        self.dateLabel = QLabel()
+        self.dateLabel.setObjectName("dateLabel")
+        detailsLayout.addWidget(self.dateLabel)
+
+        self.timeLabel = QLabel()
+        self.timeLabel.setObjectName("timeLabel")
+        detailsLayout.addWidget(self.timeLabel)
+
+        self.descriptionLabel = QLabel()
+        self.descriptionLabel.setObjectName("descriptionLabel")
+        self.descriptionLabel.setWordWrap(True)
+        detailsLayout.addWidget(self.descriptionLabel)
+
+    def updateUI(self, versionsInfo, *args):
+        """Update the UI with the version details
+        @param versionsInfo: string containing version info read from versions_list.txt"""
+        if self.versionListWidget.currentItem() is None or versionsInfo is None:
+            self.versionLabel.setText("Select a version to see details")
+            return 
+
+        currentInfo = None
+        for info in versionsInfo:
+            split = info.split(" ")
+            # Remove any empty strings or "-"s
+            split = [i for i in split if i != "" and i != "-"]
+            # Search for the current version
+            if split[0] in self.versionListWidget.currentItem().text():
+                currentInfo = split
+                break
+
+        if currentInfo is None:
+            self.versionLabel.setText("No version info found")
+            return 
+
+        version = currentInfo[0]
+        self.versionLabel.setText(version)
+
+        date = currentInfo[1]
+        self.dateLabel.setText(date)
+
+        time = currentInfo[2]
+        self.timeLabel.setText(time)
+
+        description = " ".join(currentInfo[3:])
+        self.descriptionLabel.setText(description)
+        self.descriptionLabel.setToolTip(description)

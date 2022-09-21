@@ -65,9 +65,9 @@ class UnMaya_ShotPublish:
         
     #Publishes given shot, including setting the element file, and starting the comment gui 
     def publish(self, shotToPublish):
-        selectedShot = shotToPublish[0]
-        print("Selected Shot: ", selectedShot)
-        mb_dir = self.curr_env.get_mb_dir(selectedShot)
+        self.selectedShot = shotToPublish[0]
+        print("Selected Shot: ", self.selectedShot)
+        mb_dir = self.curr_env.get_mb_dir(self.selectedShot)
         self.el = umEl.UnMaya_Element(mb_dir)
         self.comment_gui()
     
@@ -121,6 +121,13 @@ class UnMaya_ShotPublish:
         if cmds.window('ms_publish_GUI', exists=True):
             cmds.deleteUI('ms_publish_GUI')
     
+    #Returns the name of the current file
+    def get_fileName(self):
+        fullNamePath = cmds.file( q=1, sn = 1)
+        fileName_withExt = fullNamePath.split('/')[-1]
+        fileName = fileName_withExt.split('.')[0]
+        return fileName
+    
     #Saves and versions the file    
     def version_file(self):
         #Save current file
@@ -128,9 +135,29 @@ class UnMaya_ShotPublish:
         #Get new version number
         self.ver_num = self.el.get_latest_version() + 1
         dir_name = ".v" + f"{self.ver_num:04}"
+        
+        curr_fileName = self.get_fileName()
+        dest_fileName = self.selectedShot + "_main"
+        
         #Make hidden directory with version number
         new_dir_path = os.path.join(self.curr_env.get_file_dir(self.el.filepath), dir_name)
         os.mkdir(new_dir_path)
+        try:
+            os.chmod(new_dir_path, mode=0o777)
+        except Exception as e:
+            print("Unable to change permissions on version directory")
+        
+        #If current file is not the shot file, then copy the current file into the shot_main of the new shot
+        if curr_fileName != dest_fileName:
+            curr_filePath = cmds.file( q=1, sn=1) 
+            print("current filepath:", curr_filePath)
+            print("new dir path:", self.el.filepath)
+            shutil.copy(curr_filePath, self.el.filepath)
+            try:
+                os.chmod(self.el.filepath, mode=0o777)
+            except Exception as e:
+                print("Unable to change permissions on shot file")
+        
         #Copy current .mb file into new directory and rename it
         new_file_path = new_dir_path + '/' + self.el.get_file_parent_name() + self.el.get_file_extension()
         shutil.copy(self.el.filepath, new_file_path)

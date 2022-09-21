@@ -75,14 +75,16 @@ class CharacterExportInfo():
         mel.eval('FBXExport -f "{}" -s'.format(exportString))
 
 class CharacterAnimExportInfo():
-    def __init__(self, sel_exp=None, exp_name='', exp_path='', bakeComplexAnim=True, upAxis='y'):
+    def __init__(self, sel_exp=None, exp_name='', exp_path='', bakeComplexAnim=True, upAxis='y', animStartF=0, animEndF=0):
         attributes = {
             'exportType':'Animation',#common
             'selection_export': sel_exp,#common
             'export_name': exp_name,#common
             'export_path':exp_path,#common
             'upAxis': upAxis,#common
-            'bakeComplexAnim': bakeComplexAnim
+            'bakeComplexAnim': bakeComplexAnim,
+            'bakeComplexStart': animStartF,
+            'bakeComplexEnd': animEndF
         }
         self.att_list = []
         for key, val in attributes.items():
@@ -106,6 +108,8 @@ class CharacterAnimExportInfo():
         mel.eval('FBXResetExport')
         mel.eval('FBXExportBakeComplexAnimation -v '+str(self.att_list[5][1]).lower())
         mel.eval('FBXExportUpAxis '+str(self.att_list[4][1]))
+        mel.eval('FBXExportBakeComplexStart -v '+str(self.att_list[6][1]))
+        mel.eval('FBXExportBakeComplexEnd -v '+str(self.att_list[7][1]))
         exportString = str(self.att_list[3][1])+str(self.att_list[2][1])+'.fbx'
         print(exportString)
         mel.eval('FBXExport -f "{}" -s'.format(exportString))
@@ -141,6 +145,12 @@ class SceneData():
     def __init__(self):
         print('collecting data')
         self.filename = ''
+
+        self.animStartF = int(cmds.playbackOptions(q=True,animationStartTime=True))
+        self.animEndF = int(cmds.playbackOptions(q=True,animationEndTime=True))
+        self.minTimeF = int(cmds.playbackOptions(q=True,minTime=True))
+        self.maxTimeF = int(cmds.playbackOptions(q=True,maxTime=True))
+
         self.shotExportPath = self.createMayaExportPath()
         self.charUnrealExports = self.getCharacterExportSets()
         self.charAnimFbxExportInfoList = self.createCharacterAnimExportList()
@@ -173,8 +183,8 @@ class SceneData():
     def createCharacterAnimExportList(self):
         charAnimList = []
         for char in self.charUnrealExports:
-            exp_name = self.filename+'_'+char.split(':')[0]+'_Animation'
-            charAnim = CharacterAnimExportInfo(char, exp_name, self.shotExportPath)
+            expName = self.filename+'_'+char.split(':')[0]+'_Animation'
+            charAnim = CharacterAnimExportInfo(sel_exp = char, exp_name = expName, exp_path = self.shotExportPath, animStartF=self.animStartF, animEndF=self.animEndF)
             charAnimList.append(charAnim)
         return charAnimList
 
@@ -183,7 +193,7 @@ class MR_Window():
     def __init__(self, sceneData):
             
         self.window = 'MR_Window'
-        self.title = 'Shot Exporter'
+        self.title = 'Unreal FBX Exporter'
         self.size = (550, 400)
         self.allData = sceneData
 
@@ -254,7 +264,7 @@ class Task_Component():
     def __init__(self, taskLayout, taskNum, sceneData, objInfoIn = None, windowData = None):
         self.allData = sceneData
         self.CharacterInfo = CharacterExportInfo()#charInfo
-        self.AnimationInfo = CharacterAnimExportInfo()#animInfo
+        self.AnimationInfo = CharacterAnimExportInfo(animStartF=self.allData.minTimeF, animEndF=self.allData.maxTimeF)#animInfo
         self.CameraInfo = CameraExportInfo()#camInfo
         self.DataToExport = None
         self.ParentWindowData = windowData
@@ -264,7 +274,7 @@ class Task_Component():
 
         self.initialArr = [1,0,0]
         self.TaskToggleList = []
-        self.TaskToggleListStartIndex = 0
+        self.TaskToggleListStartIndex = 5 # for now, since after upAxis, all variables are diff
         self.taskNum = taskNum
         if objInfoIn != None:
             self.objInfoDetermine(objInfoIn) # to copy to the right info save
@@ -384,7 +394,7 @@ class Task_Component():
         frameLayoutColor = GREEN if self.Exportable else LIGHTGRAY
         cmds.frameLayout(self.frameLayout1, edit=True, bgc=frameLayoutColor)
 
-    
+
     def setCharacterFromMenuItem(self, charOptionMenu, exportObject, exportButton, *pArgs):
         item = cmds.optionMenu(charOptionMenu, q=True, v=True)
         #print ( "setCharacterFromMenuItem: "+item )
@@ -509,6 +519,16 @@ class Task_Component():
                         changeCommand=functools.partial(self.checkBoxChangeInfo, anim_checkBoxInfo, 0),
                         parent=parentContainer)
         
+        bASF_container = cmds.rowLayout(parent=parentContainer, nc=2)
+        cmds.text(label='Bake Complex Animation Start Frame: ', align= 'left', parent=bASF_container)
+        bakeAnimStartField = cmds.textField(tx=anim_checkBoxInfo[1], ed=True, w=50, parent=bASF_container)
+        cmds.textField(bakeAnimStartField, edit=True, cc=functools.partial(self.checkNumberChangeInfo, anim_checkBoxInfo, bakeAnimStartField, 1))
+        
+        bAEF_container = cmds.rowLayout(parent=parentContainer, nc=2)
+        cmds.text(label='Bake Complex Animation Start Frame: ', align= 'left', parent=bAEF_container)
+        bakeAnimEndField = cmds.textField(tx=anim_checkBoxInfo[2], ed=True, w=50, parent=bAEF_container)
+        cmds.textField(bakeAnimEndField, edit=True, cc=functools.partial(self.checkNumberChangeInfo, anim_checkBoxInfo, bakeAnimEndField, 2))
+        
         cmds.separator( h= 10, style= 'none', parent=parentContainer)
         self.ExportUpAxisRadioColl(parentContainer, self.AnimationInfo)
 
@@ -556,7 +576,10 @@ class Task_Component():
     def checkBoxChangeInfo(self, checkboxList, index, *pArgs):
         checkboxList[index] = not checkboxList[index]
         self.TaskToggleList = checkboxList
-        self.TaskToggleListStartIndex = index
+    
+    def checkNumberChangeInfo(self, checkboxList, numberField, index, *pArgs):
+        checkboxList[index] = cmds.textField(numberField, query=True, text=True)
+        self.TaskToggleList = checkboxList
     
     def exposeMessage(self):
         cmds.frameLayout(self.frameLayout1, edit=True, bgc=DARKGRAY)

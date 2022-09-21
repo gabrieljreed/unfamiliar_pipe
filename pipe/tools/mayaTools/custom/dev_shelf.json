@@ -31,6 +31,16 @@
 			"double-click":"",
 			"tool":"mayaTools.UnDev.reportIssue",
 			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"pipeHype.png",
+			"annotation":"PIPE HYPE",
+			"label":"HYPE",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnDev.pipeHype",
+			"function":"mayaRun.run()"
 		}
     ]
 }

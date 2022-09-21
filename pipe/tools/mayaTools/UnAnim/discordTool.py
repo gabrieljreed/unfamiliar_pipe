@@ -32,6 +32,9 @@ import maya.utils as utils
 import maya.OpenMaya as OpenMaya
 import maya.cmds as cmds
 import maya.mel as mel
+from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+import maya.OpenMayaUI as OpenMayaUI
+
 import threading
 import logging
 import base64
@@ -47,6 +50,11 @@ from json import dumps
 from json import loads
 
 import http
+
+from PySide2.QtCore import *
+from PySide2.QtWidgets import * 
+from PySide2.QtGui import *
+
 # Logging Setup
 logging.basicConfig()
 logger = logging.getLogger("gt_maya_to_discord")
@@ -257,6 +265,7 @@ def build_gui_maya_to_discord():
     # Generate Images
     # Icon
     icons_folder_dir = cmds.internalVar(userBitmapsDir=True)
+    print(icons_folder_dir)
     icon_image = icons_folder_dir + 'gt_maya_to_discord_icon.png'
 
     if os.path.isdir(icons_folder_dir) is False:
@@ -907,7 +916,111 @@ def build_gui_maya_to_discord():
 
     widget.setWindowIcon(icon)
 
-    # Main GUI Ends Here =================================================================================
+def build_gui_qt():
+    """Builds the same GUI but uses Qt because we aren't lame"""
+    pass
+
+class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
+    def __init__(self):
+        parent = self.getMayaWindow()
+
+        super(MayaToDiscordWindow, self).__init__(parent)
+        self.setWindowTitle('Maya to Discord')
+        # self.setWindowIcon(QIcon(icon_image))
+        self.setMinimumSize(300, 500)
+        self.resize(300, 500)
+        # self.setMaximumSize(300, 300)
+
+        self.main_widget = QWidget()
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setAlignment(Qt.AlignTop)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
+
+        self.channels = {
+            "Animation": "", 
+            "Modeling": "",
+            "Rigging": "",
+        }
+
+        self.icon_path = ""
+
+        self.build_gui()
+
+    def build_gui(self):
+        # Add a menu bar 
+        self.menu_bar = QtWidgets.QMenuBar(self)
+        self.menu_bar.setNativeMenuBar(False)
+        
+        self.settingsMenu = self.menu_bar.addMenu('Settings')
+        self.settingsMenu.addAction('Settings', self.openSettings)
+
+        self.helpMenu = self.menu_bar.addMenu('Help')
+        self.helpMenu.addAction('Help', self.openHelp)
+        self.helpMenu.addAction('About', self.openAbout)
+
+        # Add a status bar
+        self.status_bar = QtWidgets.QStatusBar(self)
+        self.setStatusBar(self.status_bar)
+
+        # Add a box to input text 
+        self.input_box = QtWidgets.QPlainTextEdit(self)
+        self.input_box.setPlaceholderText('Enter message here')
+        self.main_layout.addWidget(self.input_box)
+        # self.input_box.returnPressed.connect(self.send_text_message)
+        self.input_box.setMinimumHeight(50)
+        self.input_box.setMaximumHeight(50)
+
+        # Add a combo box to select the channel
+        self.channel_label = QtWidgets.QLabel('Channel')
+        self.main_layout.addWidget(self.channel_label)
+        self.channel_combo_box = QtWidgets.QComboBox(self)
+        self.channel_combo_box.addItems(self.channels.keys())
+        self.main_layout.addWidget(self.channel_combo_box)
+
+        # Add a button to send the text message
+        self.send_text_button = QtWidgets.QPushButton('Send Message only')
+        self.main_layout.addWidget(self.send_text_button)
+        self.send_text_button.setIcon(QIcon(os.path.join(self.icon_path, 'text.png')))
+
+        # Add a button to send a desktop screenshot 
+        self.send_screenshot_button = QtWidgets.QPushButton('Send Desktop Screenshot')
+        self.main_layout.addWidget(self.send_screenshot_button)
+
+        # Add a button to send a Maya screenshot
+        self.send_maya_screenshot_button = QtWidgets.QPushButton('Send Maya Screenshot')
+        self.main_layout.addWidget(self.send_maya_screenshot_button)
+
+        # Add a button to send a viewport screenshot 
+        self.send_viewport_screenshot_button = QtWidgets.QPushButton('Send Viewport Screenshot')
+        self.main_layout.addWidget(self.send_viewport_screenshot_button)
+
+        # Add a button to send a playblast 
+        self.send_playblast_button = QtWidgets.QPushButton('Send Playblast')
+        self.main_layout.addWidget(self.send_playblast_button)
+
+        # Add a button to send an FBX file
+        self.send_fbx_button = QtWidgets.QPushButton('Send FBX')
+        self.main_layout.addWidget(self.send_fbx_button)
+    
+    def getMayaWindow(self):
+        # Get Maya window
+        ptr = OpenMayaUI.MQtUtil.mainWindow()
+        if ptr is not None:
+            return wrapInstance(int(ptr), QWidget)
+    
+    def openSettings(self):
+        print('Open Settings')
+    
+    def openHelp(self):
+        print('Open Help')
+    
+    def openAbout(self):
+        print('Open About')
+
+
+
+# Main GUI Ends Here =================================================================================
 
 
 # Creates Help GUI
@@ -1701,3 +1814,7 @@ if __name__ == '__main__':
 class mayaRun:
     def run(self):
         build_gui_maya_to_discord()
+    
+    def runBetter(self):
+        ui = MayaToDiscordWindow()
+        ui.show(dockable=True)
