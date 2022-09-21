@@ -52,7 +52,7 @@ from json import loads
 import http
 
 from PySide2.QtCore import *
-from PySide2.QtWidgets import * 
+from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 # Logging Setup
@@ -916,9 +916,6 @@ def build_gui_maya_to_discord():
 
     widget.setWindowIcon(icon)
 
-def build_gui_qt():
-    """Builds the same GUI but uses Qt because we aren't lame"""
-    pass
 
 class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
     def __init__(self):
@@ -938,20 +935,24 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_widget)
 
         self.channels = {
-            "Animation": "", 
+            "Animation": "",
             "Modeling": "",
             "Rigging": "",
         }
+        # TODO: Add a way for the UI to remember the last channel used (PER USER)
 
-        self.icon_path = ""
+        # self.icon_path = "/groups/unfamiliar/anim_pipeline/icons/discordIcons"
+        self.icon_path = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir,
+                                                       "icons", "discordIcons"))
 
         self.build_gui()
+        # TODO: Need a better way to get username
+        # Maybe try getpass.getuser()?
 
     def build_gui(self):
-        # Add a menu bar 
         self.menu_bar = QtWidgets.QMenuBar(self)
         self.menu_bar.setNativeMenuBar(False)
-        
+
         self.settingsMenu = self.menu_bar.addMenu('Settings')
         self.settingsMenu.addAction('Settings', self.openSettings)
 
@@ -959,66 +960,99 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.helpMenu.addAction('Help', self.openHelp)
         self.helpMenu.addAction('About', self.openAbout)
 
-        # Add a status bar
         self.status_bar = QtWidgets.QStatusBar(self)
         self.setStatusBar(self.status_bar)
 
-        # Add a box to input text 
         self.input_box = QtWidgets.QPlainTextEdit(self)
         self.input_box.setPlaceholderText('Enter message here')
         self.main_layout.addWidget(self.input_box)
-        # self.input_box.returnPressed.connect(self.send_text_message)
         self.input_box.setMinimumHeight(50)
         self.input_box.setMaximumHeight(50)
 
-        # Add a combo box to select the channel
+        self.main_layout.addWidget(QHLine())
+
         self.channel_label = QtWidgets.QLabel('Channel')
         self.main_layout.addWidget(self.channel_label)
         self.channel_combo_box = QtWidgets.QComboBox(self)
         self.channel_combo_box.addItems(self.channels.keys())
         self.main_layout.addWidget(self.channel_combo_box)
 
-        # Add a button to send the text message
+        self.main_layout.addWidget(QHLine())
+
         self.send_text_button = QtWidgets.QPushButton('Send Message only')
         self.main_layout.addWidget(self.send_text_button)
         self.send_text_button.setIcon(QIcon(os.path.join(self.icon_path, 'text.png')))
+        self.send_text_button.clicked.connect(self.send_message)
 
-        # Add a button to send a desktop screenshot 
+        self.main_layout.addWidget(QHLine())
+
         self.send_screenshot_button = QtWidgets.QPushButton('Send Desktop Screenshot')
         self.main_layout.addWidget(self.send_screenshot_button)
+        self.send_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'desktop.png')))
+        self.send_screenshot_button.clicked.connect(self.send_desktop_screenshot)
 
-        # Add a button to send a Maya screenshot
         self.send_maya_screenshot_button = QtWidgets.QPushButton('Send Maya Screenshot')
         self.main_layout.addWidget(self.send_maya_screenshot_button)
+        self.send_maya_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'maya_window.png')))
+        self.send_maya_screenshot_button.clicked.connect(self.send_maya_screenshot)
 
-        # Add a button to send a viewport screenshot 
         self.send_viewport_screenshot_button = QtWidgets.QPushButton('Send Viewport Screenshot')
         self.main_layout.addWidget(self.send_viewport_screenshot_button)
+        # self.send_viewport_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'viewport.png')))  # FIXME: Where is this icon?
+        self.send_viewport_screenshot_button.clicked.connect(self.send_viewport_screenshot)
 
-        # Add a button to send a playblast 
+        self.main_layout.addWidget(QHLine())
+
         self.send_playblast_button = QtWidgets.QPushButton('Send Playblast')
         self.main_layout.addWidget(self.send_playblast_button)
+        self.send_playblast_button.setIcon(QIcon(os.path.join(self.icon_path, 'playblast.png')))
+        self.send_playblast_button.clicked.connect(self.send_playblast)
 
-        # Add a button to send an FBX file
         self.send_fbx_button = QtWidgets.QPushButton('Send FBX')
         self.main_layout.addWidget(self.send_fbx_button)
-    
+        self.send_fbx_button.setIcon(QIcon(os.path.join(self.icon_path, 'fbx.png')))
+        self.send_fbx_button.clicked.connect(self.send_fbx)
+
     def getMayaWindow(self):
         # Get Maya window
         ptr = OpenMayaUI.MQtUtil.mainWindow()
         if ptr is not None:
             return wrapInstance(int(ptr), QWidget)
-    
+
     def openSettings(self):
         print('Open Settings')
-    
+
     def openHelp(self):
         print('Open Help')
-    
+
     def openAbout(self):
         print('Open About')
 
+    def send_message(self):
+        print('Send Message')
 
+    def send_desktop_screenshot(self):
+        print('Send Desktop Screenshot')
+
+    def send_maya_screenshot(self):
+        print('Send Maya Screenshot')
+
+    def send_viewport_screenshot(self):
+        print('Send Viewport Screenshot')
+
+    def send_playblast(self):
+        print('Send Playblast')
+
+    def send_fbx(self):
+        print('Send FBX')
+
+
+class QHLine(QFrame):
+    """Renders a horizontal line"""
+    def __init__(self):
+        super(QHLine, self).__init__()
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
 
 # Main GUI Ends Here =================================================================================
 
