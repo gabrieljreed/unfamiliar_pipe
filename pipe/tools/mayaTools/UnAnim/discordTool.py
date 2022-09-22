@@ -930,7 +930,7 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
 
         self.main_widget = QWidget()
         self.main_layout = QVBoxLayout()
-        self.main_layout.setAlignment(Qt.AlignTop)
+        self.main_layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)
 
@@ -942,8 +942,11 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         # TODO: Add a way for the UI to remember the last channel used (PER USER)
 
         # self.icon_path = "/groups/unfamiliar/anim_pipeline/icons/discordIcons"
-        self.icon_path = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir,
+        self.icon_path = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir,
                                                        "icons", "discordIcons"))
+
+        print("Icon Path: {}".format(self.icon_path))
+        print(os.path.isdir(self.icon_path))
 
         self.build_gui()
         # TODO: Need a better way to get username
@@ -963,55 +966,79 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.status_bar = QtWidgets.QStatusBar(self)
         self.setStatusBar(self.status_bar)
 
+        # Add a spacer
+        spacer = QtWidgets.QWidget()
+        # spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding)
+        spacer.setFixedHeight(15)
+        self.main_layout.addWidget(spacer)
+
         self.input_box = QtWidgets.QPlainTextEdit(self)
         self.input_box.setPlaceholderText('Enter message here')
-        self.main_layout.addWidget(self.input_box)
         self.input_box.setMinimumHeight(50)
         self.input_box.setMaximumHeight(50)
+        self.main_layout.addWidget(self.input_box)
 
         self.main_layout.addWidget(QHLine())
 
         self.channel_label = QtWidgets.QLabel('Channel')
+        self.channel_label.setFixedHeight(20)
         self.main_layout.addWidget(self.channel_label)
         self.channel_combo_box = QtWidgets.QComboBox(self)
         self.channel_combo_box.addItems(self.channels.keys())
         self.main_layout.addWidget(self.channel_combo_box)
-
         self.main_layout.addWidget(QHLine())
 
-        self.send_text_button = QtWidgets.QPushButton('Send Message only')
-        self.main_layout.addWidget(self.send_text_button)
+        self.send_text_button = QtWidgets.QToolButton()
+        self.send_text_button.setText('Send Text')
         self.send_text_button.setIcon(QIcon(os.path.join(self.icon_path, 'text.png')))
+        self.send_text_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.send_text_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_text_button.clicked.connect(self.send_message)
+        self.main_layout.addWidget(self.send_text_button)
 
         self.main_layout.addWidget(QHLine())
 
-        self.send_screenshot_button = QtWidgets.QPushButton('Send Desktop Screenshot')
-        self.main_layout.addWidget(self.send_screenshot_button)
+        self.send_screenshot_button = QtWidgets.QToolButton()
+        self.send_screenshot_button.setText('Send Screenshot')
+        self.send_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'desktop.png')))
+        self.send_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_screenshot_button.clicked.connect(self.send_desktop_screenshot)
+        self.main_layout.addWidget(self.send_screenshot_button)
 
-        self.send_maya_screenshot_button = QtWidgets.QPushButton('Send Maya Screenshot')
-        self.main_layout.addWidget(self.send_maya_screenshot_button)
+        self.send_maya_screenshot_button = QtWidgets.QToolButton()
+        self.send_maya_screenshot_button.setText("Send Maya Screenshot")
+        self.send_maya_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_maya_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'maya_window.png')))
+        self.send_maya_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_maya_screenshot_button.clicked.connect(self.send_maya_screenshot)
+        self.main_layout.addWidget(self.send_maya_screenshot_button)
 
-        self.send_viewport_screenshot_button = QtWidgets.QPushButton('Send Viewport Screenshot')
-        self.main_layout.addWidget(self.send_viewport_screenshot_button)
-        # self.send_viewport_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'viewport.png')))  # FIXME: Where is this icon?
+        self.send_viewport_screenshot_button = QtWidgets.QToolButton()
+        self.send_viewport_screenshot_button.setText('Send Viewport Screenshot')
+        self.send_viewport_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.send_viewport_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'maya_window.png')))  # FIXME: Where is this icon?
+        self.send_viewport_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_viewport_screenshot_button.clicked.connect(self.send_viewport_screenshot)
+        self.main_layout.addWidget(self.send_viewport_screenshot_button)
 
         self.main_layout.addWidget(QHLine())
 
-        self.send_playblast_button = QtWidgets.QPushButton('Send Playblast')
-        self.main_layout.addWidget(self.send_playblast_button)
+        self.send_playblast_button = QtWidgets.QToolButton()
+        self.send_playblast_button.setText('Send Playblast')
+        self.send_playblast_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_playblast_button.setIcon(QIcon(os.path.join(self.icon_path, 'playblast.png')))
+        self.send_playblast_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_playblast_button.clicked.connect(self.send_playblast)
+        self.main_layout.addWidget(self.send_playblast_button)
 
-        self.send_fbx_button = QtWidgets.QPushButton('Send FBX')
-        self.main_layout.addWidget(self.send_fbx_button)
+        self.send_fbx_button = QtWidgets.QToolButton()
+        self.send_fbx_button.setText('Send FBX')
+        self.send_fbx_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_fbx_button.setIcon(QIcon(os.path.join(self.icon_path, 'fbx.png')))
+        self.send_fbx_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_fbx_button.clicked.connect(self.send_fbx)
+        self.main_layout.addWidget(self.send_fbx_button)
 
     def getMayaWindow(self):
         # Get Maya window
