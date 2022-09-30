@@ -34,6 +34,16 @@
 		},
 		{
 			"itemType":"button",
+			"icon":"YarnDollLogo.png",
+			"annotation":"Reference Dolls Rig",
+			"label":"DOLLS",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.reference",
+			"function":"reference.rig('dolls')"
+		},
+		{
+			"itemType":"button",
 			"icon":"frog.png",
 			"annotation":"Reference Frog Rig",
 			"label":"FROG",
@@ -141,16 +151,6 @@
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.discordTool",
 			"function":"mayaRun.run()"
-		},
-		{
-			"itemType":"button",
-			"icon":"MLP_Discord.png",
-			"annotation":"Launch Discord tool (still in development)",
-			"label":"Discord",
-			"menu":0,
-			"double-click":"",
-			"tool":"mayaTools.UnAnim.discordTool",
-			"function":"mayaRun.runBetter()"
 		},
 		{
 			"itemType":"button",

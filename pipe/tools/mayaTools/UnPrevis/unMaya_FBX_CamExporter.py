@@ -235,7 +235,10 @@ class Camera_Exporter:
 
         if not self.dir_exists(filepath):
             os.mkdir(filepath)
-            os.chmod(filepath, mode=0o777)
+            try:
+                os.chmod(filepath, mode=0o770)
+            except Exception as e:
+                print("Unable to change permissions on version directory")     
 
         if withFile:
             self.houdini_filepath_noExt = filepath + "/camera_main"
@@ -284,19 +287,28 @@ class Camera_Exporter:
             curr_filepath = curr_filepath + "/" + self.subsequence + "/" + self.UNREAL_EXPORTS_FOLDER
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                os.chmod(curr_filepath, mode=0o777)
+                try:
+                    os.chmod(curr_filepath, mode=0o770)
+                except Exception as e:
+                    print("Unable to change permissions on version directory")    
             
             #inserts the "camera" directory into the path
             curr_filepath = curr_filepath + "/" + self.CAM_DIR
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                os.chmod(curr_filepath, mode=0o777)            
+                try:
+                    os.chmod(curr_filepath, mode=0o770)
+                except Exception as e:
+                    print("Unable to change permissions on version directory")              
 
             #inserts the specific shot directory into the path
             curr_filepath = curr_filepath + "/" + self.shot_selection 
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                os.chmod(curr_filepath, mode=0o777)            
+                try:
+                    os.chmod(curr_filepath, mode=0o770)
+                except Exception as e:
+                    print("Unable to change permissions on version directory")            
 
     
             return curr_filepath
@@ -335,10 +347,32 @@ class Camera_Exporter:
         full_newCam = [new_cam]
         full_newCam.extend(cmds.listRelatives(new_cam, allDescendents=True))
 
+        #Copies keyframes for each control on the camera
         index = 0
         for cam_piece in full_origCam:
-            if cmds.keyframe(cam_piece, query=True, time=(self.shot_start, self.shot_end), keyframeCount=True) > 0:   
+            if cmds.keyframe(cam_piece, query=True, time=(self.shot_start, self.shot_end), keyframeCount=True) > 0:
+                #Gets current keyframes and checks if there are any keyframes on the first and last frame of the shot
+                curr_keyframes = cmds.keyframe(cam_piece, q=True)
+                if self.shot_start in curr_keyframes:
+                    start = True
+                else:
+                    start = False
+                if self.shot_end in curr_keyframes:
+                    end = True
+                else:
+                    end = False
+                
+                #Sets keyframes on the first and last frame of the shot
+                cmds.setKeyframe(cam_piece, insert=True, t=[self.shot_start, self.shot_end])
+
+                #Copies keyframes over to the other camera
                 self.copy_keyframes(cam_piece, full_newCam[index])
+                
+                #Removes the start and end frame keyframes if they did not previously exist
+                if not start:
+                    cmds.cutKey( cam_piece, time=(self.shot_start, self.shot_start))
+                if not end:
+                    cmds.cutKey( cam_piece, time=(self.shot_end, self.shot_end)) 
             index += 1
     
     #copies the keyframes from one obj to another
@@ -364,7 +398,11 @@ class Camera_Exporter:
         new_cam = self.new_houdini_cam
         
         mel.eval(command)
-        os.chmod(self.houdini_filepath, mode=0o777)
+        try:
+            os.chmod(self.houdini_filepath, mode=0o770)
+        except Exception as e:
+            print("Unable to change permissions on version directory")            
+
         
         #delete duplicate camera
         cmds.select(new_cam)
@@ -413,7 +451,10 @@ class Camera_Exporter:
 
         ##mel.eval('FBXExport -f "'+path+'" -s')
         mel.eval('FBXExport -f "'+self.unreal_filepath+'" -s')
-        os.chmod(self.unreal_filepath, mode=0o777)
+        try:
+            os.chmod(self.unreal_filepath, mode=0o777)
+        except Exception as e:
+            print("Unable to change permissions on version directory")     
 
         #delete duplicate camera
         cmds.select(new_unreal_cam)

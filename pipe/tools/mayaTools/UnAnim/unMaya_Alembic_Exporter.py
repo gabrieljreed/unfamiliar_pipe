@@ -240,6 +240,11 @@ class UnMaya_Alembic_Exporter():
         #Copy alembic into the new directory and rename it
         new_file_path = new_dir_path + "/" + self.el.get_file_parent_name() + self.el.get_file_extension()
         shutil.copy(self.el.filepath, new_file_path)
+        try:
+            os.chmod(self.el.filepath, mode=0o770)
+            os.chmod(new_file_path, mode=0o770)
+        except Exception as e:
+            print("Unable to update permissions on alembic files")
     
     #updates the element file with the comment
     def update_element_file(self):

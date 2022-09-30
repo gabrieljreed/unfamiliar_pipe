@@ -58,4 +58,17 @@ from pipe.tools.houdiniTools.shading.txmake_repath import TxmakeRepath
 txmakeRepath = TxmakeRepath()
 hou.session.txmakeRepath = txmakeRepath]]></script>
   </tool>
+
+  <tool name="Tex Delete" label="Tex Delete" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+import importlib
+import pipe.tools.houdiniTools.shading.tex_delete as curTool
+importlib.reload(curTool)
+
+from pipe.tools.houdiniTools.shading.tex_delete import TexDelete
+
+texDelete = TexDelete()
+hou.session.texDelete = texDelete
+]]></script>
+  </tool>
 </shelfDocument>

@@ -34,6 +34,9 @@ class reference:
 
         elif rigName == 'frog':
             filePath = '/groups/unfamiliar/anim_pipeline/production/rigs/frog/frog_main.mb'
+        
+        elif rigName == 'dolls':
+            filePath = '/groups/unfamiliar/anim_pipeline/production/rigs/dolls/dolls_main.mb'
 
         elif rigName == 'amoogus':
             filePath = '/groups/unfamiliar/anim_pipeline/production/rigs/amoogus/amoogus_main.ma'

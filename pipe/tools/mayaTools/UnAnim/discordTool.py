@@ -6,6 +6,7 @@
     - Modeling
     - Rigging
     - Animation
+    - Memes
 
 """
 
@@ -35,6 +36,9 @@ import maya.mel as mel
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 import maya.OpenMayaUI as OpenMayaUI
 
+import subprocess
+import getpass
+import pwd
 import threading
 import logging
 import base64
@@ -74,12 +78,12 @@ python_version = sys.version_info.major
 _BOUNDARY_CHARS = string.digits + string.ascii_letters
 
 # Settings
-gt_mtod_settings = {'discord_webhook': '',
+gt_mtod_settings = {'discord_webhook': 'https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2',
                     'discord_webhook_name': '',
                     'is_first_time_running': False,
                     'custom_username': '',
                     'image_format': 'jpg',
-                    'video_format': 'mov',
+                    'video_format': 'mp4',
                     'video_scale_pct': 40,
                     'video_compression': 'Animation',
                     'video_output_type': 'qt',
@@ -90,6 +94,25 @@ gt_mtod_settings = {'discord_webhook': '',
 
 # Default Settings (Deep Copy)
 gt_mtod_settings_default = copy.deepcopy(gt_mtod_settings)
+
+webhooks = {
+    "modeling": "https://discord.com/api/webhooks/1023982094608760992/jA-Qc4dsjMiW2bIv0SCjfWIQ7cLPU2sYG6JOoe3lDtxereD_iZmJ1Hou1Fy4h74Y38bG", 
+    "rigging": "https://discord.com/api/webhooks/1023982237986865243/ZzrEB1dd4s3Syu7Pf4ZCMhiT6f8-FCklJpmdPGVjhIiTgk8b4XayNVTS5y0ZhAY5rz8G",
+    "playblasts": "https://discord.com/api/webhooks/1024091123427319829/JJBiUopUhYgukCVD-wgENA2tx8bsDRwn7VWMXx09Sn7rgsIvRd5Dc1d9-X15GyTyfMkk",
+    "memes": "https://discord.com/api/webhooks/1023981999255470271/tzJcjAJ7DtV4f1cYPqZNUeEq8HPjnNa-7ypCSj3RtavxPoeervVR9EWSVMIsxfkS3WCp", 
+}
+
+signatures = [
+    "via Maya",
+    "sent from my Samsung Smart Fridge",
+    "sent from my Samsung Smart Toilet",
+    "via smoke signals",
+    "via Morse code",
+    "sent by carrier pigeon",
+    "translated from ancient metal plates",
+    "via the power of the sun",
+    "live from Taco Bell",
+]
 
 
 def get_persistent_settings_maya_to_discord():
@@ -150,6 +173,8 @@ def get_persistent_settings_maya_to_discord():
 
     if stored_timestamp_visibility_exists:
         gt_mtod_settings['timestamp_visibility'] = bool(cmds.optionVar(q="gt_maya_to_discord_timestamp_visibility"))
+    
+    # gt_mtod_settings['discord_webhook'] = "https://discord.com/api/webhooks/1023982237986865243/ZzrEB1dd4s3Syu7Pf4ZCMhiT6f8-FCklJpmdPGVjhIiTgk8b4XayNVTS5y0ZhAY5rz8G"
 
 
 def set_persistent_settings_maya_to_discord(custom_username, webhook, image_format, video_format, video_scale,
@@ -265,7 +290,6 @@ def build_gui_maya_to_discord():
     # Generate Images
     # Icon
     icons_folder_dir = cmds.internalVar(userBitmapsDir=True)
-    print(icons_folder_dir)
     icon_image = icons_folder_dir + 'gt_maya_to_discord_icon.png'
 
     if os.path.isdir(icons_folder_dir) is False:
@@ -383,6 +407,12 @@ def build_gui_maya_to_discord():
     cmds.separator(h=7, style='none')  # Empty Space
     cmds.separator(h=5)
 
+    cmds.rowColumnLayout(nc=2, cw=[(1, 128), (2, 128), (3, 5)], cs=[(1, 10), (2, 4), (3, 0)], p=content_main)
+    cmds.text(l="Channel:", align="center", fn="boldLabelFont")
+    # radioButtons = cmds.radioButtonGrp(labelArray3=["#modeling", "#rigging", "#animation"], numberOfRadioButtons=3, vertical=True, sl=1)
+    radioButtons = cmds.radioButtonGrp(labelArray4=list(webhooks.keys()), numberOfRadioButtons=4, vertical=True, sl=1)
+
+    cmds.rowColumnLayout(nc=1, cw=[(1, 260), (2, 1), (3, 5)], cs=[(1, 10), (2, 0), (3, 0)], p=content_main)
     cmds.separator(h=7, style='none')  # Empty Space
     attached_message_txtfield = cmds.textField(pht='Attached Message (Optional)', text="")
     cmds.separator(h=10, style='none')  # Empty Space
@@ -477,6 +507,15 @@ def build_gui_maya_to_discord():
         else:
             user_name = gt_mtod_settings.get('custom_username') + ' (' + socket.gethostname() + ')'
 
+        username = pwd.getpwuid(os.getuid())[4]
+        username = username.split(" ")
+        if len(username) == 3:
+            username = username[0] + ' ' + username[2]
+        else:
+            username = username[0] + ' ' + username[1]
+        # Get a random entry in the list of signatures
+        signature = random.choice(signatures)
+        return "{} ({})".format(username, signature)
         return user_name
 
     def update_text_status(error=False):
@@ -588,14 +627,29 @@ def build_gui_maya_to_discord():
         cmds.iconTextButton(send_obj_btn, e=True, enable=True)
         cmds.iconTextButton(send_fbx_btn, e=True, enable=True)
 
+    def get_currently_selected_channel():
+        """
+        Gets the currently selected channel from the channel list
+        
+        Returns:
+            string: Name of the channel selected.
+        
+        """
+        index = cmds.radioButtonGrp(radioButtons, q=True, sl=True)
+        webhook = list(webhooks.values())[index - 1]
+        return webhook
+
     # Button Functions ----------
     webhook_error_message = 'Sorry, something went wrong. Please review your webhook and settings.'
 
     def send_desktop_screenshot():
         """ Attempts to send a desktop screenshot using current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             try:
                 update_text_status()
@@ -609,8 +663,10 @@ def build_gui_maya_to_discord():
                 def threaded_upload():
                     try:
                         utils.executeDeferred(disable_buttons)
+                        # response = discord_post_attachment(get_username(), upload_message, temp_desktop_ss_file,
+                        #                                    gt_mtod_settings.get('discord_webhook'))
                         response = discord_post_attachment(get_username(), upload_message, temp_desktop_ss_file,
-                                                           gt_mtod_settings.get('discord_webhook'))
+                                                           currentWebhook)
                         utils.executeDeferred(enable_buttons)
                         utils.executeDeferred(parse_sending_response, response)
                         utils.executeDeferred(attached_text_message, 'desktop screenshot', response)
@@ -631,9 +687,12 @@ def build_gui_maya_to_discord():
 
     def send_maya_window():
         """ Attempts to send an image of the maya window using current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             try:
                 update_text_status()
@@ -647,8 +706,10 @@ def build_gui_maya_to_discord():
                 def threaded_upload():
                     try:
                         utils.executeDeferred(disable_buttons)
+                        # response = discord_post_attachment(get_username(), upload_message, temp_img_file,
+                        #                                    gt_mtod_settings.get('discord_webhook'))
                         response = discord_post_attachment(get_username(), upload_message, temp_img_file,
-                                                           gt_mtod_settings.get('discord_webhook'))
+                                                           currentWebhook)
                         utils.executeDeferred(enable_buttons)
                         utils.executeDeferred(parse_sending_response, response)
                         utils.executeDeferred(attached_text_message, 'Maya window screenshot', response)
@@ -668,9 +729,12 @@ def build_gui_maya_to_discord():
 
     def send_viewport_only():
         """ Attempts to send an image of the active viewport using current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             try:
                 update_text_status()
@@ -687,8 +751,10 @@ def build_gui_maya_to_discord():
                 def threaded_upload():
                     try:
                         utils.executeDeferred(disable_buttons)
+                        # response = discord_post_attachment(get_username(), upload_message, temp_img_file,
+                        #                                    gt_mtod_settings.get('discord_webhook'))
                         response = discord_post_attachment(get_username(), upload_message, temp_img_file,
-                                                           gt_mtod_settings.get('discord_webhook'))
+                                                           currentWebhook)
                         utils.executeDeferred(enable_buttons)
                         utils.executeDeferred(parse_sending_response, response)
                         utils.executeDeferred(attached_text_message, 'viewport screenshot', response)
@@ -708,9 +774,14 @@ def build_gui_maya_to_discord():
 
     def send_animated_playblast():
         """ Attempts to record a playblast and upload it using the current settings """
+        currentWebhook = get_currently_selected_channel()
+        update_discord_webhook_validity(currentWebhook)
+        gt_mtod_settings['is_new_instance'] = True
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             try:
                 update_text_status()
@@ -721,7 +792,8 @@ def build_gui_maya_to_discord():
                     if current_scene_name.endswith('.ma') or current_scene_name.endswith('.mb'):
                         current_scene_name = current_scene_name[:-3]
 
-                temp_path = generate_temp_file(gt_mtod_settings.get('video_format'), file_name=current_scene_name)
+                # temp_path = generate_temp_file(gt_mtod_settings.get('video_format'), file_name=current_scene_name)
+                temp_path = generate_temp_file("mov", file_name=current_scene_name)
                 disable_buttons()  # This needs to happen before creating the playblast to avoid multiple clicks
                 temp_playblast_file = capture_playblast_animation(temp_path, gt_mtod_settings.get('video_scale_pct'),
                                                                   gt_mtod_settings.get('video_compression'),
@@ -734,8 +806,12 @@ def build_gui_maya_to_discord():
 
                 def threaded_upload():
                     try:
+                        # response = discord_post_attachment(get_username(), upload_message, temp_playblast_file,
+                        #                                    gt_mtod_settings.get('discord_webhook'))
+                        import ssl
+                        ssl._create_default_https_context = ssl._create_unverified_context
                         response = discord_post_attachment(get_username(), upload_message, temp_playblast_file,
-                                                           gt_mtod_settings.get('discord_webhook'))
+                                                           currentWebhook)
                         utils.executeDeferred(enable_buttons)
                         utils.executeDeferred(parse_sending_response, response)
                         utils.executeDeferred(attached_text_message, 'playblast', response)
@@ -760,9 +836,12 @@ def build_gui_maya_to_discord():
 
     def send_message_only():
         """ Attempts to send the message only (no images/videos) using current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             try:
                 upload_message = cmds.textField(attached_message_txtfield, q=True, text=True)
@@ -772,8 +851,10 @@ def build_gui_maya_to_discord():
                     def threaded_upload():
                         try:
                             utils.executeDeferred(disable_buttons)
+                            # response = discord_post_message(get_username(), upload_message,
+                            #                                 gt_mtod_settings.get('discord_webhook'))
                             response = discord_post_message(get_username(), upload_message,
-                                                            gt_mtod_settings.get('discord_webhook'))
+                                                            currentWebhook)
                             utils.executeDeferred(enable_buttons)
                             utils.executeDeferred(parse_sending_response, response)
                             utils.executeDeferred(response_inview_feedback, 'message', response,
@@ -798,9 +879,12 @@ def build_gui_maya_to_discord():
 
     def send_model_obj():
         """ Attempts to export selected model as an OBJ file and upload it using the current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             selection = cmds.ls(selection=True)
             if len(selection) > 0:
@@ -826,8 +910,10 @@ def build_gui_maya_to_discord():
 
                     def threaded_upload():
                         try:
+                            # response = discord_post_attachment(get_username(), upload_message, temp_exported_obj,
+                            #                                    gt_mtod_settings.get('discord_webhook'))
                             response = discord_post_attachment(get_username(), upload_message, temp_exported_obj,
-                                                               gt_mtod_settings.get('discord_webhook'))
+                                                               currentWebhook)
                             utils.executeDeferred(enable_buttons)
                             utils.executeDeferred(parse_sending_response, response)
                             utils.executeDeferred(attached_text_message, 'OBJ file', response)
@@ -853,9 +939,12 @@ def build_gui_maya_to_discord():
 
     def send_model_fbx():
         """ Attempts to export selected model as an FBX file and upload it using the current settings """
+        currentWebhook = get_currently_selected_channel()
         if gt_mtod_settings.get('is_new_instance'):
-            update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            # update_discord_webhook_validity(gt_mtod_settings.get('discord_webhook'))
+            update_discord_webhook_validity(currentWebhook)
 
+        gt_mtod_settings['is_webhook_valid'] = True
         if gt_mtod_settings.get('is_webhook_valid'):
             selection = cmds.ls(selection=True)
             if len(selection) > 0:
@@ -880,8 +969,10 @@ def build_gui_maya_to_discord():
 
                     def threaded_upload():
                         try:
+                            # response = discord_post_attachment(get_username(), upload_message, temp_path,
+                            #                                    gt_mtod_settings.get('discord_webhook'))
                             response = discord_post_attachment(get_username(), upload_message, temp_path,
-                                                               gt_mtod_settings.get('discord_webhook'))
+                                                               currentWebhook)
                             utils.executeDeferred(enable_buttons)
                             utils.executeDeferred(parse_sending_response, response)
                             utils.executeDeferred(attached_text_message, 'FBX file', response)
@@ -926,7 +1017,6 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         # self.setWindowIcon(QIcon(icon_image))
         self.setMinimumSize(300, 500)
         self.resize(300, 500)
-        # self.setMaximumSize(300, 300)
 
         self.main_widget = QWidget()
         self.main_layout = QVBoxLayout()
@@ -935,24 +1025,25 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_widget)
 
         self.channels = {
+            "Test": "https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2",
             "Animation": "",
             "Modeling": "",
             "Rigging": "",
         }
         # TODO: Add a way for the UI to remember the last channel used (PER USER)
 
-        # self.icon_path = "/groups/unfamiliar/anim_pipeline/icons/discordIcons"
         self.icon_path = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir,
                                                        "icons", "discordIcons"))
-
-        print("Icon Path: {}".format(self.icon_path))
-        print(os.path.isdir(self.icon_path))
 
         self.build_gui()
         # TODO: Need a better way to get username
         # Maybe try getpass.getuser()?
 
+        self.webhook_error_message = 'Webhook is invalid. Please, check your settings.'
+
     def build_gui(self):
+        self.setWindowIcon(QIcon(os.path.normpath(os.path.join(self.icon_path, "discord.png"))))
+
         self.menu_bar = QtWidgets.QMenuBar(self)
         self.menu_bar.setNativeMenuBar(False)
 
@@ -1056,7 +1147,46 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         print('Open About')
 
     def send_message(self):
-        print('Send Message')
+        """ Attempts to send the message only (no images/videos) using current settings """
+        currentWebhook = self.channels[self.channel_combo_box.currentText()]
+        if gt_mtod_settings.get('is_new_instance'):
+            print("Checking webhook validity...")
+            update_discord_webhook_validity(currentWebhook)
+
+        if gt_mtod_settings.get('is_webhook_valid'):
+            try:
+                upload_message = self.input_box.toPlainText()
+                print(upload_message)
+                return
+                if upload_message.strip() != '':
+                    update_text_status()
+
+                    def threaded_upload():
+                        try:
+                            # utils.executeDeferred(disable_buttons)
+                            response = discord_post_message(get_username(), upload_message,
+                                                            gt_mtod_settings.get('discord_webhook'))
+                            # utils.executeDeferred(enable_buttons)
+                            utils.executeDeferred(parse_sending_response, response)
+                            utils.executeDeferred(response_inview_feedback, 'message', response,
+                                                  display_inview=gt_mtod_settings.get('feedback_visibility'))
+                            utils.executeDeferred(clear_attached_message, response)
+                        except Exception as exception:
+                            logger.debug(str(exception))
+                            update_text_status(error=True)
+                            cmds.warning(webhook_error_message)
+
+                    thread = threading.Thread(None, target=threaded_upload)
+                    thread.start()
+                else:
+                    cmds.warning(
+                        'Your message is empty, please type something in case you want to send only a message.')
+            except Exception as e:
+                logger.debug(str(e))
+                update_text_status(error=True)
+                cmds.warning(self.webhook_error_message)
+        else:
+            cmds.warning(self.webhook_error_message)
 
     def send_desktop_screenshot(self):
         print('Send Desktop Screenshot')
@@ -1682,7 +1812,23 @@ def capture_playblast_animation(video_file, scale_pct, compression, video_format
 
     playblast = cmds.playblast(p=scale_pct, f=video_file, compression=compression, format=video_format,
                                forceOverwrite=True, v=False)
-    file_size = os.path.getsize(playblast)
+
+    outputFile = playblast.replace(".mov", ".mp4")
+    # Erase the output file if it already exists
+    if os.path.exists(outputFile):
+        os.remove(outputFile)
+        print("File exists, removing...")
+
+    try:
+        result = subprocess.run(["ffmpeg", "-i", playblast, "-vcodec", "h264", "-acodec", "mp2", outputFile])
+        print("stdout: {}".format(result.stdout))
+        print("stderr: {}".format(result.stderr))
+        print("returncode: {}".format(result.returncode))
+
+    except Exception as e:
+        print(e)
+
+    file_size = os.path.getsize(outputFile)
     OpenMayaUI.M3dView.active3dView().portHeight()
     message = '<span style=\"color:#FFFFFF;\">Playblast File Size:' \
               '</span> <span style=\"color:#FF0000;text-decoration:underline;\">' + \
@@ -1696,11 +1842,11 @@ def capture_playblast_animation(video_file, scale_pct, compression, video_format
     print('Video Scale: ' + str(scale_pct) + '%')
     print('Compression: ' + compression)
     print('OutputType: ' + video_format)
-    print('File path: ' + playblast)
+    print('File path: ' + outputFile)
     print('File size in bytes: ' + str(file_size))
     print('File size: ' + get_readable_size(file_size, precision=2))
     print('#' * 80)
-    return playblast
+    return outputFile
 
 
 def get_available_playblast_compressions(input_format):

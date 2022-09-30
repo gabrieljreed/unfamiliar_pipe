@@ -19,8 +19,37 @@ class UnMaya_ShotPublish:
         self.curr_env = umEnv.UnMaya_Environment()
         self.shot_list = self.curr_env.get_shot_list()
         self.shot_list = sorted(self.shot_list)
-        self.select_shot_gui()
+        self.checkout_check()
+        ##self.select_shot_gui()
     
+    #Checks to see if shot is checked out to the current user. Gives option to check out if it is not currently, or blocks publishing if the current user is not the current owner
+    def checkout_check(self):
+        temp_el = umEl.UnMaya_Element(cmds.file( q=1, sn = 1))
+        assigned_user = temp_el.get_assigned_user()
+        if assigned_user == "":
+            confirm = cmds.confirmDialog ( title='WARNING', message="This shot is not currently checked out. Check it out now?", button=['Yes', 'No'], defaultButton='Yes', dismissString='Other' )
+            if confirm == "Yes":
+                print("Checking out shot")
+                curr_user = self.curr_env.get_username()
+                temp_el.assign_user(curr_user)
+                temp_el.write_element_file()
+                confirm = cmds.confirmDialog ( title='Complete', message="The shot is now checked out to you. Continue with publishing?", button=['Yes', 'No'], defaultButton='Yes', dismissString='Other' )
+                if confirm == "Yes":
+                    self.select_shot_gui()
+                else:
+                    pass
+            else:
+                pass                
+        elif assigned_user != self.curr_env.get_username():
+            confirm = cmds.confirmDialog ( title='WARNING', message="This shot is checked out to someone else. Close shot?", button=['Yes', 'No'], defaultButton='Yes', dismissString='Other' )
+            if confirm == "Yes":
+                self.quit_shot("CHECKIN")
+                #self.checkin_without_saving()
+            else:
+                pass
+        else:
+            self.select_shot_gui()   
+
     #Receives a textScrollList and returns the currently selected list item
     def getSelected(self, scrollList):
         selected = cmds.textScrollList(scrollList, q=1, si=1)
@@ -50,9 +79,55 @@ class UnMaya_ShotPublish:
         #Button to select the shot that is currently open
         cmds.button(label="Select Current Shot", c=lambda x: self.select_current_shot(selection))
         #Button to publish the selected shot
-        cmds.button(label="Publish Shot", c=lambda x: self.publish(self.getSelected(selection)))
+        cmds.button(label="Publish Shot", backgroundColor=[0,1,1], c=lambda x: self.publish(self.getSelected(selection)))
         cmds.setParent("..")
-        
+
+        cmds.rowLayout(nc=1)
+        cmds.button(label="Checkin current file without publishing", c=lambda x: self.checkin_without_saving())               
+        cmds.setParent("..")
+    
+    #Allows user to check in the current shot without publishing. Reverts the shot file to the most recent version to erase any changes since last publish
+    def checkin_without_saving(self): 
+        confirm = cmds.confirmDialog ( title='WARNING', message="Progress since last publish will not be saved. Would you still like to continue?", button=['Yes', 'No'], defaultButton='Ok', dismissString='Other' )
+        if confirm == "Yes":
+            print("Checking in")
+            if cmds.window("ms_publish_GUI", exists=True):
+                cmds.deleteUI("ms_publish_GUI")
+            
+            fullNamePath = cmds.file( q=1, sn = 1)
+            print("filepath", fullNamePath)    
+            
+            try:
+                #Access and update Element file
+                temp_el = umEl.UnMaya_Element(fullNamePath)
+                temp_el.assign_user('')
+                temp_el.write_element_file()
+            
+                #Get current version folder
+                filePath_segments = fullNamePath.split('/')
+                shotName_parts = filePath_segments[-1].split('.')[0].split('_')[0:-1]
+                shotName = '_'.join(shotName_parts)
+                filePath_segments.pop()
+                dirPath = '/'.join(filePath_segments)
+                version = temp_el.get_latest_version()
+                dir_name = ".v" + f"{version:04}"
+                version_filepath = dirPath + "/" + dir_name + "/" + shotName + ".mb"
+          
+                #Copy most recent version file into the current file
+                shutil.copy(version_filepath, fullNamePath)
+                #Make sure permissions are properly set
+                try:
+                    os.chmod(fullNamePath, mode=0o770)
+                except Exception as e:
+                    print("Unable to update permissions on shot file")
+            except Exception as e:
+                print("Unable to revert to most recent version")
+            self.quit_shot("CHECKIN")                            
+        else:
+            pass
+
+
+    
     def select_current_shot(self, scrollList):
         
         #Gets name of current shot
@@ -73,6 +148,9 @@ class UnMaya_ShotPublish:
     
     #GUI: gets comment from current user about current publish version  
     def comment_gui(self):
+        if cmds.window("ms_publish_GUI", exists=True):
+                cmds.deleteUI("ms_publish_GUI")        
+
         #Make list of past comments for the gui
         publishes = self.el.get_publishes_list()
         if len(publishes) > 10:
@@ -120,6 +198,8 @@ class UnMaya_ShotPublish:
             
         if cmds.window('ms_publish_GUI', exists=True):
             cmds.deleteUI('ms_publish_GUI')
+
+        self.quit_shot("PUBLISH")
     
     #Returns the name of the current file
     def get_fileName(self):
@@ -143,7 +223,7 @@ class UnMaya_ShotPublish:
         new_dir_path = os.path.join(self.curr_env.get_file_dir(self.el.filepath), dir_name)
         os.mkdir(new_dir_path)
         try:
-            os.chmod(new_dir_path, mode=0o777)
+            os.chmod(new_dir_path, mode=0o770)
         except Exception as e:
             print("Unable to change permissions on version directory")
         
@@ -154,7 +234,7 @@ class UnMaya_ShotPublish:
             print("new dir path:", self.el.filepath)
             shutil.copy(curr_filePath, self.el.filepath)
             try:
-                os.chmod(self.el.filepath, mode=0o777)
+                os.chmod(self.el.filepath, mode=0o770)
             except Exception as e:
                 print("Unable to change permissions on shot file")
         
@@ -190,3 +270,24 @@ class UnMaya_ShotPublish:
         cmds.textScrollList( "Shot_List", edit=True, removeAll=True)
         cmds.textScrollList( "Shot_List", edit=True, append=self.shot_list)
         cmds.textFieldGrp('search_field', edit=True, text="")  
+
+    #Prepares to exit shot, and gives the option to either exit maya, or checkout a different shot    
+    def quit_shot(self, type):
+        if type == "CHECKIN":
+            confirm = cmds.confirmDialog ( title='Shot Checked in', message="Shot successfully checked-in or returned. Close shot and keep Maya open, or exit Maya?", button=['Close Shot', 'Exit Maya'], defaultButton='Exit Maya', dismissString='Other' )
+            if confirm == "Close Shot":
+                cmds.file(newFile=True, force=True)
+            else:
+                cmds.quit(force=True)
+        elif type == "PUBLISH":
+            confirm = cmds.confirmDialog ( title='Shot Published', message="Shot successfully published. Keep working, close shot but keep Maya open, or exit Maya?", button=['Continue Working', 'Close Shot', 'Exit Maya'], defaultButton='Exit Maya', dismissString='Other' )
+            if confirm == "Continue Working":
+                temp_el = umEl.UnMaya_Element(cmds.file( q=1, sn = 1))
+                curr_user = self.curr_env.get_username()
+                temp_el.assign_user(curr_user)
+                temp_el.write_element_file()
+            elif confirm == "Close Shot":
+                cmds.file(newFile=True)
+                
+            else:
+                cmds.quit()

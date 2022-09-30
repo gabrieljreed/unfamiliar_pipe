@@ -33,3 +33,4 @@ export HOUDINI_OTLSCAN_PATH=${HOUDINI_TOOLS}"/custom/hda;&"
 #Start Houdini
 echo "Starting Houdini..."
 houdinifx -foreground -desktop UnSolaris $@ &
+
