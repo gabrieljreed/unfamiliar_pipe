@@ -78,28 +78,29 @@ python_version = sys.version_info.major
 _BOUNDARY_CHARS = string.digits + string.ascii_letters
 
 # Settings
-gt_mtod_settings = {'discord_webhook': 'https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2',
-                    'discord_webhook_name': '',
-                    'is_first_time_running': False,
-                    'custom_username': '',
-                    'image_format': 'jpg',
-                    'video_format': 'mp4',
-                    'video_scale_pct': 40,
-                    'video_compression': 'Animation',
-                    'video_output_type': 'qt',
-                    'is_new_instance': True,
-                    'is_webhook_valid': False,
-                    'feedback_visibility': True,
-                    'timestamp_visibility': True}
+gt_mtod_settings = {
+    'discord_webhook': 'https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2',
+    'discord_webhook_name': '',
+    'is_first_time_running': False,
+    'custom_username': '',
+    'image_format': 'jpg',
+    'video_format': 'mp4',
+    'video_scale_pct': 40,
+    'video_compression': 'Animation',
+    'video_output_type': 'qt',
+    'is_new_instance': True,
+    'is_webhook_valid': False,
+    'feedback_visibility': True,
+    'timestamp_visibility': True}
 
 # Default Settings (Deep Copy)
 gt_mtod_settings_default = copy.deepcopy(gt_mtod_settings)
 
 webhooks = {
-    "modeling": "https://discord.com/api/webhooks/1023982094608760992/jA-Qc4dsjMiW2bIv0SCjfWIQ7cLPU2sYG6JOoe3lDtxereD_iZmJ1Hou1Fy4h74Y38bG", 
+    "modeling": "https://discord.com/api/webhooks/1023982094608760992/jA-Qc4dsjMiW2bIv0SCjfWIQ7cLPU2sYG6JOoe3lDtxereD_iZmJ1Hou1Fy4h74Y38bG",
     "rigging": "https://discord.com/api/webhooks/1023982237986865243/ZzrEB1dd4s3Syu7Pf4ZCMhiT6f8-FCklJpmdPGVjhIiTgk8b4XayNVTS5y0ZhAY5rz8G",
     "playblasts": "https://discord.com/api/webhooks/1024091123427319829/JJBiUopUhYgukCVD-wgENA2tx8bsDRwn7VWMXx09Sn7rgsIvRd5Dc1d9-X15GyTyfMkk",
-    "memes": "https://discord.com/api/webhooks/1023981999255470271/tzJcjAJ7DtV4f1cYPqZNUeEq8HPjnNa-7ypCSj3RtavxPoeervVR9EWSVMIsxfkS3WCp", 
+    "memes": "https://discord.com/api/webhooks/1023981999255470271/tzJcjAJ7DtV4f1cYPqZNUeEq8HPjnNa-7ypCSj3RtavxPoeervVR9EWSVMIsxfkS3WCp",
 }
 
 signatures = [
@@ -173,7 +174,7 @@ def get_persistent_settings_maya_to_discord():
 
     if stored_timestamp_visibility_exists:
         gt_mtod_settings['timestamp_visibility'] = bool(cmds.optionVar(q="gt_maya_to_discord_timestamp_visibility"))
-    
+
     # gt_mtod_settings['discord_webhook'] = "https://discord.com/api/webhooks/1023982237986865243/ZzrEB1dd4s3Syu7Pf4ZCMhiT6f8-FCklJpmdPGVjhIiTgk8b4XayNVTS5y0ZhAY5rz8G"
 
 
@@ -520,12 +521,12 @@ def build_gui_maya_to_discord():
 
     def update_text_status(error=False):
         """
-        Updates UI texts to say "Uploading" or "Error" 
-        
+        Updates UI texts to say "Uploading" or "Error"
+
         Args:
             error (bool): Determines if it will update it to be red and say error or yellow to say Uploading.
                           Default = Uploading (False)
-        
+
         """
         if not error:
             cmds.text(status_message_text, e=True, l='Uploading', bgc=(1, 1, 0))
@@ -591,8 +592,9 @@ def build_gui_maya_to_discord():
                     if upload_message.strip() != '':
                         def threaded_upload():
                             try:
+                                currentWebhook = get_currently_selected_channel()
                                 discord_post_message(get_username(), upload_message,
-                                                     gt_mtod_settings.get('discord_webhook'))
+                                                     currentWebhook)
                                 utils.executeDeferred(response_inview_feedback, operation_name, response,
                                                       display_inview=gt_mtod_settings.get('feedback_visibility'))
                                 utils.executeDeferred(clear_attached_message, response)
@@ -1032,8 +1034,9 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         }
         # TODO: Add a way for the UI to remember the last channel used (PER USER)
 
-        self.icon_path = os.path.normpath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir,
-                                                       "icons", "discordIcons"))
+        self.icon_path = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir,
+                         "icons", "discordIcons"))
 
         self.build_gui()
         # TODO: Need a better way to get username
@@ -1083,7 +1086,8 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.send_text_button.setText('Send Text')
         self.send_text_button.setIcon(QIcon(os.path.join(self.icon_path, 'text.png')))
         self.send_text_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.send_text_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_text_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_text_button.clicked.connect(self.send_message)
         self.main_layout.addWidget(self.send_text_button)
 
@@ -1093,7 +1097,8 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.send_screenshot_button.setText('Send Screenshot')
         self.send_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'desktop.png')))
-        self.send_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_screenshot_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_screenshot_button.clicked.connect(self.send_desktop_screenshot)
         self.main_layout.addWidget(self.send_screenshot_button)
 
@@ -1101,15 +1106,18 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.send_maya_screenshot_button.setText("Send Maya Screenshot")
         self.send_maya_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_maya_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'maya_window.png')))
-        self.send_maya_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_maya_screenshot_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_maya_screenshot_button.clicked.connect(self.send_maya_screenshot)
         self.main_layout.addWidget(self.send_maya_screenshot_button)
 
         self.send_viewport_screenshot_button = QtWidgets.QToolButton()
         self.send_viewport_screenshot_button.setText('Send Viewport Screenshot')
         self.send_viewport_screenshot_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.send_viewport_screenshot_button.setIcon(QIcon(os.path.join(self.icon_path, 'maya_window.png')))  # FIXME: Where is this icon?
-        self.send_viewport_screenshot_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_viewport_screenshot_button.setIcon(
+            QIcon(os.path.join(self.icon_path, 'maya_window.png')))  # FIXME: Where is this icon?
+        self.send_viewport_screenshot_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_viewport_screenshot_button.clicked.connect(self.send_viewport_screenshot)
         self.main_layout.addWidget(self.send_viewport_screenshot_button)
 
@@ -1119,7 +1127,8 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.send_playblast_button.setText('Send Playblast')
         self.send_playblast_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_playblast_button.setIcon(QIcon(os.path.join(self.icon_path, 'playblast.png')))
-        self.send_playblast_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_playblast_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_playblast_button.clicked.connect(self.send_playblast)
         self.main_layout.addWidget(self.send_playblast_button)
 
@@ -1127,7 +1136,8 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.send_fbx_button.setText('Send FBX')
         self.send_fbx_button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.send_fbx_button.setIcon(QIcon(os.path.join(self.icon_path, 'fbx.png')))
-        self.send_fbx_button.setStyleSheet("QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
+        self.send_fbx_button.setStyleSheet(
+            "QToolButton::hover { background-color: #2f3136; } QToolButton { background-color: #23272a; border: 1px solid #2f3136; border-radius: 4px; }")
         self.send_fbx_button.clicked.connect(self.send_fbx)
         self.main_layout.addWidget(self.send_fbx_button)
 
@@ -1206,10 +1216,12 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
 
 class QHLine(QFrame):
     """Renders a horizontal line"""
+
     def __init__(self):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
         self.setFrameShadow(QFrame.Sunken)
+
 
 # Main GUI Ends Here =================================================================================
 
@@ -1915,7 +1927,7 @@ def discord_get_webhook_name(webhook_url):
     if python_version == 3:
         try:
             host, path = parse_discord_api(webhook_url)
-            import http 
+            import http
             import ssl
             ssl._create_default_https_context = ssl._create_unverified_context
             connection = http.client.HTTPSConnection(host)  # This is where it errors out 
@@ -2021,7 +2033,7 @@ if __name__ == '__main__':
 class mayaRun:
     def run(self):
         build_gui_maya_to_discord()
-    
+
     def runBetter(self):
         ui = MayaToDiscordWindow()
         ui.show(dockable=True)
