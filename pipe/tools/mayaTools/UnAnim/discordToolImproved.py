@@ -1,3 +1,12 @@
+"""This is a heavily modified version of the original discord tool by Guilherme Trevisan found here:
+https://github.com/TrevisanGMW/gt-tools/blob/release/python-scripts/gt_maya_to_discord.py
+
+Changes include:
+- Added support for multiple discord channels
+- Added video compression through ffmpeg
+
+To change the channels, edit the webhooks dictionary in the code below.
+"""
 import os
 import threading
 import json
@@ -186,11 +195,12 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
     def send_message(self):
         """ Attempts to send the message only (no images/videos) using current settings """
         currentWebhook = self.channels[self.channel_combo_box.currentText()]
+        print(currentWebhook)
 
-        # Validate the webhook
-        if not self._checkWebhookValidity(currentWebhook):
-            mc.warning('Invalid webhook, please check your settings.')
-            return
+        # # Validate the webhook
+        # if not self._checkWebhookValidity(currentWebhook):
+        #     mc.warning('Invalid webhook, please contact Gabe')
+        #     return
 
         message = self.input_box.toPlainText()
         if message.strip() == '':
@@ -242,7 +252,7 @@ class MayaToDiscordWindow(MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
                 return False
 
         except Exception as e:
-            print(e)
+            print("Error checking webhook validity: {}".format(e))
             return False
 
     @staticmethod

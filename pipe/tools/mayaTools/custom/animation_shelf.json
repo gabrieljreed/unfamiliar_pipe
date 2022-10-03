@@ -95,16 +95,6 @@
 		{
 			"itemType":"button",
 			"icon":"y.svg",
-			"annotation":"Import Production Model",
-			"label":"PROD",
-			"menu":0,
-			"double-click":"",
-			"tool":"mayaTools.UnAnim.importProdModel",
-			"function":"mayaRun.run()"
-		},
-		{
-			"itemType":"button",
-			"icon":"y.svg",
 			"annotation":"Import Production Model with Reference",
 			"label":"PROD REF",
 			"menu":0,
@@ -115,7 +105,7 @@
 		{
 			"itemType":"button",
 			"icon":"rollback.svg",
-			"annotation":"Refresh Production Model (still in development)",
+			"annotation":"Refresh Production Models",
 			"label":"REF",
 			"menu":0,
 			"double-click":"",

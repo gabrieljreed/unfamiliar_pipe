@@ -238,66 +238,97 @@ class PropExportInfo(ExportInfo):
             for child in sel_children:
                 self.findJointLocation(child, grp_lst, jnt_lst, loc_list, bind_to_jnt, False)
     
-    def makeSkinningGroups(self, mesh_grp, dup_grp):
-        print(mesh_grp)
+    def makeSkinningGroups(self, mesh_grp):
         all_shapes = []
         for i,d_k in enumerate(mesh_grp):
             rels = cmds.listRelatives(d_k)
             rels.append(d_k)
-            #print(rels)
             shape_list = []
             exlude_group = mesh_grp.copy()
             exlude_group.remove(d_k)
-            #print('exclude_grp: '+str(exlude_group))
             for r in rels:
-                '''for grp in grp_lst:
-            dup = [s for s in duplicate if grp in s]
-            if dup:
-                dup_mesh_grp.append(dup[0])'''
-
-
                 shape = cmds.listRelatives(r, shapes=True)
                 if shape and r not in exlude_group:
-                    dup = [s for s in dup_grp if r in s]
-                    if dup:
-                        shape_list.append(dup[0])
-                #print(' is '+str(shape)+'in  exclude_group?: '+ str(shape in exlude_group))
-            #print('joint: '+str(jnt_list[i]))
-            #print(shape_list)
+                    shape_list.append(r)
             all_shapes.append(shape_list)
-            for obj in shape_list:
-                print("  "+str(obj))
-                #cmds.skinCluster(jnt_list[i], obj, n=obj+'_skinCluster', tsb=True, bm=0, sm=0, nw=1)
-            #print(' ')
-        print("HELLO!!!!!")
-        for slist in all_shapes:
-            print(str(slist))
-        
+        return all_shapes
+    
+    def skinGroups(self, joints, skins_grp):
+        '''print("Skin Groups!!!!!")
+        for slist in skins_grp:
+            print(str(slist))'''
+        for i,joint in enumerate(joints):
+            for mesh in skins_grp[i]:
+              cmds.skinCluster(joint, mesh, n=mesh+'_skinCluster', tsb=True, bm=0, sm=0, nw=1)  
 
     def runTask(self):
         main_grp = self.att_list[1][1]
         cmds.select(main_grp, r=True)
         grp_lst = []
         jnt_lst = []
-        loc_lst = []
-        new_grp = cmds.group( em=True, name=str(self.att_list[2][1])+'_temp_duplicate' )
-        mesh_grp = cmds.group( em=True, name=str(self.att_list[2][1])+'_mesh')
+        loc_lst = [] #delete all of these locs too
+        new_grp = cmds.group( em=True, name=str(self.att_list[2][1])+'_temp_duplicate' ) # select to delete everything
+        mesh_grp = cmds.group( em=True, name=str(self.att_list[2][1])+'_mesh') #select the mesh grp to export
         cmds.parent(mesh_grp, new_grp)
         duplicate = cmds.duplicate(main_grp, rc=True)
+        cmds.parent(duplicate[0], mesh_grp)
+        cmds.select(new_grp, r=True)
+        w_joint = cmds.joint(n=main_grp+'_world_jnt', p=(0,0,0)) # select this joint to export
+
+        self.findJointLocation(main_grp, grp_lst,jnt_lst, loc_lst,  None, True)
+        #print(str(grp_lst)+'\n'+str(jnt_lst)+'\n'+str(loc_lst))
+
+        dup_mesh_grp = []
+        for grp in grp_lst:
+            dup = [s for s in duplicate if grp in s]
+            if dup:
+                dup_mesh_grp.append(dup[0])
+
+        skin_grps = self.makeSkinningGroups(dup_mesh_grp)
+
+        #reset_parenting
         cmds.parent(duplicate, mesh_grp)
         for dup in duplicate:
             shape = cmds.listRelatives(dup, shapes=True)
             if not shape: cmds.delete(dup)
-        cmds.select(new_grp, r=True)
-        w_joint = cmds.joint(n=main_grp+'_world_jnt', p=(0,0,0))
-
-        self.findJointLocation(main_grp, grp_lst,jnt_lst, loc_lst,  None, True)
-        print(str(grp_lst)+'\n'+str(jnt_lst)+'\n'+str(loc_lst))
-
-        self.makeSkinningGroups(grp_lst, duplicate)
-
         
-        print(" ")
+        self.skinGroups(jnt_lst, skin_grps)
+        self.exportFBX(new_grp, mesh_grp, w_joint, loc_lst)
+    
+    def exportFBX(self, new_grp, mesh_grp, w_joint, loc_lst):
+
+        cmds.select(w_joint, r=True)
+        cmds.select(mesh_grp, add=True)
+        
+        #cmds.cacheEvaluator(flushCache='destroy')
+        #cmds.cacheEvaluator(cacheFillMode = 'syncAsync')
+        #cmds.cacheEvaluator(query=True, safeModeMessages=True)
+        #cmds.cacheEvaluator(waitForCache=10) #chache wait command!!!!!!!!
+        #cmds.pause( sec=10 )
+
+        mel.eval('FBXResetExport')
+        mel.eval('FBXExportUpAxis '+str(self.att_list[4][1]))
+        mel.eval('FBXExportSmoothingGroups -v '+str(self.att_list[5][1]).lower())
+        mel.eval('FBXExportSmoothMesh -v '+str(self.att_list[6][1]).lower())
+        mel.eval('FBXExportHardEdges -v '+str(self.att_list[7][1]).lower()) #Split Vertex Normals
+        mel.eval('FBXExportTriangulate -v '+str(self.att_list[8][1]).lower())
+        mel.eval('FBXExportTangents -v '+str(self.att_list[9][1]).lower()) #Tangents & Binormals
+        mel.eval('FBXExportSkins -v '+str(self.att_list[10][1]).lower()) #Skinning
+        mel.eval('FBXExportShapes -v '+str(self.att_list[11][1]).lower()) #Blendshapes
+
+        mel.eval('FBXExportInputConnections -v '+str(self.att_list[12][1]).lower())
+        mel.eval('FBXExportEmbeddedTextures -v '+str(self.att_list[13][1]).lower())
+
+        mel.eval('FBXExportBakeComplexAnimation -v '+str(self.att_list[14][1]).lower())
+        mel.eval('FBXExportBakeComplexStart -v '+str(self.att_list[15][1]))
+        mel.eval('FBXExportBakeComplexEnd -v '+str(self.att_list[16][1]))
+        exportString = str(self.att_list[3][1])+str(self.att_list[2][1])+'.fbx'
+        print(exportString)
+        mel.eval('FBXExport -f "{}" -s'.format(exportString))
+
+        #delete temp duplicate group and locators stuff
+        cmds.delete(new_grp)
+        cmds.delete(loc_lst)
 
 
 class CameraExportInfo(ExportInfo):
@@ -391,7 +422,7 @@ class MR_Window():
     def __init__(self, sceneData):
             
         self.window = 'MR_Window'
-        self.title = 'Unreal FBX Exporter; DON\' USE THE PROP EXPORTER YET!!!!'
+        self.title = 'Unreal FBX Exporter'
         self.size = (550, 400)
         self.allData = sceneData
 
@@ -900,5 +931,5 @@ class UnrealExporter():
             print("___________________________")                              
         myWindow = MR_Window(allData)
         #print(allData.charUnrealExports)
-ue = UnrealExporter()
-ue.run()
+#ue = UnrealExporter()
+#ue.run()

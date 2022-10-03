@@ -3,3 +3,4 @@
 **/__pycache__/
 **/env.sh
 **/.vscode/
+**/__private/
