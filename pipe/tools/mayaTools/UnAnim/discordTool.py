@@ -113,6 +113,7 @@ signatures = [
     "translated from ancient metal plates",
     "via the power of the sun",
     "live from Taco Bell",
+    "from ur moms house",
 ]
 
 
