@@ -1,7 +1,7 @@
 # BYU Unfamiliar Pipeline
 
 ## Description
-This is a heavily modified version of the [previous pipeline](https://github.com/smartins1234/BYU_anm_pipeline) used on the Cenote film project, with many tools and improvements for the Unfamiliar film project. Improvements include: 
+This is a heavily modified version of the [Cenote film pipeline](https://github.com/smartins1234/BYU_anm_pipeline) with many tools and improvements for the Unfamiliar film project. Improvements include: 
 - Full adoption of USDs
 - Use of Python 3
 
@@ -42,14 +42,23 @@ UnMaya provides several custom shelves with functionality specifically for Unfam
   - **Discord:** Launches the Maya to Discord tool
   - **AnimBot:** Loads the AnimBot plugin for animators
 - UnPipe
+  - **Get Asset List:** 
+  - **Get Shot List:**
 - UnRig
   - **Publish:** Publishes a rig and versions it in its correct location within the `production` folder
 - UnFiles
+  - **Checkout:** Launches a dialog to check out a shot
+  - **Publish:** Publishes a shot
 - UnDev
   - **Debug:** Launches a debug session using `debugpy` that can be attached to with VS Code. 
   - **Unload:** Unloads all python packages allowing for code refreshes without having to reopen Maya.
   - **Report:** Launches a dialog allowing the user to report an issue on the Github page. 
 - UnPrevis
+  - **Import DAG:**
+  - **Export DAG:**
+  - **Cam FBX:**
+  - **Unreal Export:** Omar's toolio
+
 
 ### Houdini
 
