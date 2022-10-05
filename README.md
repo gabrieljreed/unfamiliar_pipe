@@ -10,12 +10,12 @@ This pipeline has been developed on and for CentOS 7.
 Asset management makes heavy use of the `groups` folder in the BYU CS server. Since every user has access to the groups folder, this pipeline does not have tools for sharing assets between users/computers.
 
 ## Table of Contents
-- [Usage and features](https://github.com/gabrieljreed/unfamiliar_pipe#usage--features)
+- [Usage and features](https://github.com/gabrieljreed/unfamiliar_pipe#usage--features) (for artists)
   - [Maya](https://github.com/gabrieljreed/unfamiliar_pipe#maya)
   - [Houdini](https://github.com/gabrieljreed/unfamiliar_pipe#houdini)
   - [Nuke](https://github.com/gabrieljreed/unfamiliar_pipe#nuke)
 
-- [Development](https://github.com/gabrieljreed/unfamiliar_pipe#development)
+- [Development](https://github.com/gabrieljreed/unfamiliar_pipe#development) (for programmers)
   - [Maya](https://github.com/gabrieljreed/unfamiliar_pipe#autodesk-maya-2023)
   - [Houdini](https://github.com/gabrieljreed/unfamiliar_pipe#sidefx-houdini-195)
   - [Nuke](https://github.com/gabrieljreed/unfamiliar_pipe#nuke-1)
