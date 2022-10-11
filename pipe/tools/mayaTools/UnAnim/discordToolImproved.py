@@ -28,15 +28,24 @@ import maya.cmds as mc
 import maya.utils as mu
 
 
-webhooks = {
-    # "modeling": "https://discord.com/api/webhooks/1023982094608760992/jA-Qc4dsjMiW2bIv0SCjfWIQ7cLPU2sYG6JOoe3lDtxereD_iZmJ1Hou1Fy4h74Y38bG",
-    # "rigging": "https://discord.com/api/webhooks/1023982237986865243/ZzrEB1dd4s3Syu7Pf4ZCMhiT6f8-FCklJpmdPGVjhIiTgk8b4XayNVTS5y0ZhAY5rz8G",
-    # "playblasts": "https://discord.com/api/webhooks/1024091123427319829/JJBiUopUhYgukCVD-wgENA2tx8bsDRwn7VWMXx09Sn7rgsIvRd5Dc1d9-X15GyTyfMkk",
-    # "memes": "https://discord.com/api/webhooks/1023981999255470271/tzJcjAJ7DtV4f1cYPqZNUeEq8HPjnNa-7ypCSj3RtavxPoeervVR9EWSVMIsxfkS3WCp",
-    "general": "https://discord.com/api/webhooks/1017080257666351144/WpIPUVYjsVJ4At2ARMla2uv9rYVzHlC0BkJLSt0rWNRuDmGxOrNnfRJRXTybBhEn8PSy",
-    "memes": "https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2",
-    "stuff": "https://discord.com/api/webhooks/1022539010209484830/Oaxafq6CnXuQChclGJyB80ROTF6kaVR5XDNs9OM-oq3TtuLofk1IVD3XwoS6EeEHpQMV",
-}
+webhooks = {}
+
+
+# Load in the webhooks from the webhooks.json file
+def load_webhooks():
+    """ Loads in the webhooks from the webhooks.json file """
+    global webhooks
+    webhooks_file = os.path.join(os.path.dirname(__file__), "__private", 'webhooks.json')
+    print(webhooks_file)
+    print(os.path.exists(webhooks_file))
+    if os.path.exists(webhooks_file):
+        with open(webhooks_file, 'r') as f:
+            webhooks = json.loads(f.read())["testingWebhooks"]
+    else:
+        mc.warning('webhooks.json file not found')
+
+
+load_webhooks()
 
 signatures = [
     "via Maya",

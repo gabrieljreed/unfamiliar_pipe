@@ -22,7 +22,7 @@ Asset management makes heavy use of the `groups` folder in the BYU CS server. Si
 
 ## Usage & Features
 ### Maya
-Unmaya can be started by running the script directly, (e.g. `/groups/unfamiliar/anim_pipeline/launch/maya.sh`) or clicking the unmaya icon in the `icons` folder.
+Unmaya can be started by clicking the unmaya icon in the `icons` folder or running the `maya.sh` script directly, (e.g. `/groups/unfamiliar/anim_pipeline/launch/maya.sh`).
 #### Shelves
 UnMaya provides several custom shelves with functionality specifically for Unfamiliar and other silly things.
 - UnAnim
@@ -34,7 +34,7 @@ UnMaya provides several custom shelves with functionality specifically for Unfam
   - **Amogus:** References the Amogus rig into the current scene
   - **Previous Rig:** Launches a dialog to reference a previous version of a rig into current scene
   - **Layout:** Imports the USD layout into the current scene
-  - **Cam:** ??
+  - **Cam:** References the exported production camera
   - **Prod Ref:** Converts a selected prop in the USD layout into an FBX reference that can be animated on
   - **Ref:** Refreshes all prop references to their most recent USD version
   - **Export Alembic:** Launches a dialog to export the current shot as an alembic and publish it into the pipe
@@ -42,7 +42,7 @@ UnMaya provides several custom shelves with functionality specifically for Unfam
   - **Discord:** Launches the Maya to Discord tool
   - **AnimBot:** Loads the AnimBot plugin for animators
 - UnPipe
-  - **Get Asset List:** 
+  - **Get Asset List:**  
   - **Get Shot List:**
 - UnRig
   - **Publish:** Publishes a rig and versions it in its correct location within the `production` folder
@@ -54,13 +54,44 @@ UnMaya provides several custom shelves with functionality specifically for Unfam
   - **Unload:** Unloads all python packages allowing for code refreshes without having to reopen Maya.
   - **Report:** Launches a dialog allowing the user to report an issue on the Github page. 
 - UnPrevis
-  - **Import DAG:**
-  - **Export DAG:**
-  - **Cam FBX:**
-  - **Unreal Export:** Omar's toolio
+  - **Import DAG:** brings model in as a Maya shape
+  - **Export DAG:** bakes animation back into USD (very buggy!)
+  - **Cam FBX:** exports camera for both Unreal and production
+  - **Unreal Export:** Maya to Unreal export tool dialog
 
 
 ### Houdini
+Undini can be started by clicking the undini icon in the `icons` folder or running the `houdini.sh` script directly, (e.g. `/groups/unfamiliar/anim_pipeline/launch/houdini.sh`).
+
+#### File menu
+Undini provides a custom file menu, UnPipe, that provides shot functionality. 
+ - **Shot>Checkout:** checks out a shot 
+ - **Shot>Return:** returns a shot
+
+#### Shelves
+Undini provides several custom shelves with functionality specifically for Unfamiliar. 
+ - UnAnim
+   - **Layout:** brings in an `unlayout` node that imports the USD layout
+   - **Singe:** brings in an `unanim` node that imports the Singe model. Also warns the user if they have not checked out a shot.
+   - **Maggie:** brings in an `unanim` node that imports the Maggie model. Also warns the user if they have not checked out a shot.
+   - **Kelleth:** brings in an `unanim` node that imports the Kelleth model. Also warns the user if they have not checked out a shot.
+ - UnShading
+   - Edit Model
+   - Edit Shader
+   - Build Shader
+   - Txmake Repath
+   - Tex Delete
+
+
+#### Nodes
+UnDini defines many custom nodes with functionality specifically for Unfamiliar.
+ - **unlayout:** imports the USD layout with the correct scale.
+ - **uncamera:** brings the camera in to an OBJ context and allows for exporting into the pipeline.
+ - **unanim:** imports a specified character for animation.
+ - **untpose:** imports a character in t-pose at the correct scale.
+ - **unfx:** ask Brendan
+ - **uncloth:** used by the `unfx` node
+ - **unhair:** used by the `unfx` node
 
 
 ### Nuke
@@ -75,6 +106,8 @@ The `maya.sh` file found in the `launch/` folder is a bash script that sets many
 The `userSetup.py` file located in the `pipe` folder sets up the custom shelves and keyboard shortcuts that turn Maya into the unmaya we all know and love.
 
 It can be started by running the script directly, (e.g. `/groups/unfamiliar/anim_pipeline/launch/maya.sh`) or clicking the unmaya icon in the `icons` folder.
+
+To edit Maya environment variables, make changes within the `maya.sh` file.
 
 To add a new shelf, create a json file within `/pipe/tools/mayaTools/custom`. It will be automatically detected when unmaya launches. 
 

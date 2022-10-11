@@ -79,7 +79,7 @@ _BOUNDARY_CHARS = string.digits + string.ascii_letters
 
 # Settings
 gt_mtod_settings = {
-    'discord_webhook': 'https://discord.com/api/webhooks/1018918495590830151/ANHb9lismw1276JvPgG1ZTT7mr2OWdKeDmR-_Apt96jqOGumtiOi5PY0AlptCNVXA-r2',
+    'discord_webhook': '',
     'discord_webhook_name': '',
     'is_first_time_running': False,
     'custom_username': '',
@@ -127,7 +127,22 @@ signatures = [
     "via the power of the sun",
     "live from Taco Bell",
     "from ur moms house",
-    "tattooed to Kelly's bicep"
+    "tattooed to Kelly's bicep",
+    "via Blender",
+    "drawing a star starting from 2",
+    "from the Pentagon",
+    "copying everything Pixar does",
+    "via an attribWrangle node",
+    "GOBLIN MODE",
+    "GOBLIN GOBLIN GOBLIN",
+    "https://youtu.be/dQw4w9WgXcQ",
+    "read from a tarot card",
+    "no",
+    "no u <3",
+    "peepee poopoo",
+    "live from the Rancheritos funeral",
+    "inside a white van",
+    "via a hotspot duct taped to a fish",
 ]
 
 

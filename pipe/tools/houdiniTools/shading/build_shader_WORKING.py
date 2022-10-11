@@ -5,8 +5,14 @@ import hou
 import os 
 import pathlib
 
-#This class gets the name of an asset from a selected material library node, 
-#then builds a basic shading network based on that information. 
+#This class asks the user for the location on disk of texture maps, then builds
+#a basic shading network. It can create either previs (usdpreviewsurface) or prod
+#(pxrsurface) shaders. 
+#I want to build better error handling for this eventually, but in the meantime -
+#if you're stuck, here are some common issues: 
+    #texture maps do not have the exact same base name as the asset
+    #textures were exported from substance painter with an incorrect export preset
+    #filepath is incorrect 
 
 class BuildShader():
 
@@ -62,8 +68,6 @@ class BuildShader():
         #print("sel nodes = "+str(hou.selectedNodes()))
         if(hou.selectedNodes() == ()):
             print("Please select a material library node. Closing tool.")
-            hou.ui.displayMessage("Please select a material library "+
-            "node.",buttons=("Okay",),title="Error")
             quit()
         matLibNode = hou.selectedNodes()[0]
         #print("matLibNode = " + str(matLibNode))
@@ -71,8 +75,6 @@ class BuildShader():
         #if it's not a material library, yell at them 
         if(matLibNode.type().name() != 'materiallibrary'):
             print("Please select a material library node. Closing tool.")
-            hou.ui.displayMessage("Please select a material library "+
-            "node.",buttons=("Okay",),title="Error")
             quit()
 
         #if it is a material library, determine the purpose
@@ -277,7 +279,6 @@ class BuildShader():
             self.ImportTextureFile(roughness, "Roughness")
             self.ImportTextureFile(normal, "Normal")
             self.ImportTextureFile(height, "Height")
-        hou.ui.displayMessage("Finished building " + self.purpose + " shader for " +self.shaderName+".",buttons=("Okay",),title="Error")
 
 buildShader = BuildShader()
 buildShader.DefineAssetInfo()
