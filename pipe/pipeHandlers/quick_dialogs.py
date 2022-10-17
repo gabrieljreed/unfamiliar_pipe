@@ -1,22 +1,23 @@
-#Please dont ask me about this one I didn't care to learn PySide
-#so this is copied directly from Stonk's Cenote pipe
+# Please dont ask me about this one I didn't care to learn PySide
+# so this is copied directly from Stonk's Cenote pipe
 
 from PySide2 import QtWidgets, QtCore, QtGui
-import os #, hou        we can't have import hou here because it makes it break on the maya side
+import os  # , hou        we can't have import hou here because it makes it break on the maya side
 from pipe.pipeHandlers.environment import Environment as env
 
-'''Reports a critical error'''
+
 def error(errMsg, details=None, title='Error'):
+    '''Reports a critical error'''
     message(errMsg, details=details, title=title)
 
 
-'''Reports a non-critical warning'''
 def warning(warnMsg, details=None, title='Warning'):
+    '''Reports a non-critical warning'''
     message(warnMsg, details=details, title=title)
 
 
-'''Reports a message'''
 def message(msg=' ', details=None, title='Message'):
+    '''Reports a message'''
     print(msg)
 
     msgBox = QtWidgets.QMessageBox()
@@ -36,20 +37,20 @@ def message(msg=' ', details=None, title='Message'):
     msgBox.exec_()
 
 
-'''Reports an informational message'''
 def info(infoMsg, title='Info'):
+    '''Reports an informational message'''
     message(msg=infoMsg, title=title)
 
 
 def light_error(errMsg, title='Warning'):
-    '''Reports an error that can be resolved with a yes or no'''
-    '''returns True if yes, otherwise False'''
+    '''Reports an error that can be resolved with a yes or no
+    returns True if yes, otherwise False'''
     return yes_or_no(errMsg, title=title)
 
 
 def yes_or_no(question, details=None, title='Question'):
-    '''Asks a question that can be resolved with a yes or no'''
-    '''returns True if yes, otherwise False'''
+    '''Asks a question that can be resolved with a yes or no
+    returns True if yes, otherwise False'''
     msgBox = QtWidgets.QMessageBox()
     msgBox.setText(msgBox.tr(question))
     msgBox.setWindowTitle(title)
@@ -84,6 +85,7 @@ def input(label, title='Input', text=None):
     else:
         return None
 
+
 def chooseFile(parent=None, caption=None, dir="/"):
     '''
     Allows the user to select a file location
@@ -92,13 +94,11 @@ def chooseFile(parent=None, caption=None, dir="/"):
     return fileName
 
 
-'''
-	Have to use this instead of input in houdini to avoid black text on black bar
-'''
 class HoudiniInput(QtWidgets.QDialog):
     '''
     submitted is a class variable that must be instantiated outside of __init__
     in order for the Signal to be created correctly.
+    Have to use this instead of input in houdini to avoid black text on black bar
     '''
     submitted = QtCore.Signal(list)
 
@@ -117,7 +117,7 @@ class HoudiniInput(QtWidgets.QDialog):
 
     def initializeVBox(self):
         self.vbox = QtWidgets.QVBoxLayout()
-        #QApplication.setActiveWindow()
+        # QApplication.setActiveWindow()
         self.initializeInfoText()
         self.initializeTextBar()
         self.initializeSubmitButton()
@@ -156,19 +156,17 @@ class HoudiniInput(QtWidgets.QDialog):
 
         self.values = newText
 
-    '''Get the current state of the loading indicator gif as an icon'''
-
     def setButtonIcon(self, frame):
+        '''Get the current state of the loading indicator gif as an icon'''
         icon = QtGui.QIcon(self.movie.currentPixmap())
         self.button.setIcon(icon)
 
-    '''
-    	Send the selected values to a function set up in the calling class and
-    	close the window. Use connect() on submitted to set up the receiving func.
-    '''
-
     def submit(self):
-        print('comment input: '+ self.values +'\n')
+        '''
+            Send the selected values to a function set up in the calling class and
+            close the window. Use connect() on submitted to set up the receiving func.
+        '''
+        print('comment input: ' + self.values + '\n')
         self.button.setText("Loading...")
         icon_path = os.path.join(env().project_dir, "pipe", "tools", "_resources", "loading_indicator_transparent.gif")
         self.movie = QtGui.QMovie(icon_path)
@@ -181,13 +179,15 @@ class HoudiniInput(QtWidgets.QDialog):
         self.close()
 
 
-'''
-I don't think this was ever used.
-'''
 class VersionWindow(QtWidgets.QMainWindow):
+    '''
+    I don't think this was ever used.
+    '''
 
-    def __init__(self, parent):#=hou.qt.mainWindow()):  # you're going to have to set the parent explicitly when you call this function
-        super(VersionWindow, self).__init__(parent)     # because importing hou raises an error when this runs in maya
+    def __init__(self, parent):  # =hou.qt.mainWindow()):
+        super(VersionWindow, self).__init__(parent)
+        # you're going to have to set the parent explicitly when you call this function
+        # because importing hou raises an error when this runs in maya
 
         # Function to build the UI
         # Create main widget
@@ -229,8 +229,6 @@ class VersionWindow(QtWidgets.QMainWindow):
         # Global layout setting
         global_layout.addLayout(layout)
         global_layout.addWidget(self.set_version)
-
-
 
 
 # PySide2 UI - custom QSpinBox that supports a zero padded syntax
@@ -290,20 +288,21 @@ def binary_option(text, optionOne, optionTwo, title='Question'):
         return False
     return None
 
+
 class CheckboxSelect(QtWidgets.QDialog):
 
     submitted = QtCore.Signal(list)
-    
+
     def __init__(self, text, options, title="", parent=None):
         '''Creates check box options based on the given list of strings'''
         '''returns a list of booleans, each one correstponding to its respective option'''
         super(CheckboxSelect, self).__init__(parent=parent)
 
-        #window = QtWidgets.QDialog(parent=parent)
-        #self.setWindowTitle(title)
+        # window = QtWidgets.QDialog(parent=parent)
+        # self.setWindowTitle(title)
 
         self.layout = QtWidgets.QVBoxLayout()
-        
+
         label = QtWidgets.QLabel()
         label.setText(text)
         self.layout.addWidget(label)

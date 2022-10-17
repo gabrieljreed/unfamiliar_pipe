@@ -1,5 +1,5 @@
-#Please dont ask me about this one I didn't care to learn PySide
-#so this is copied directly from Stonk's Cenote pipe
+# Please dont ask me about this one I didn't care to learn PySide
+# so this is copied directly from Stonk's Cenote pipe
 
 try:
     from PySide import QtGui as QtWidgets
@@ -12,27 +12,31 @@ from pipe.pipeHandlers.environment import Environment as env
 
 import os
 
+
 def select_from_list(list, parent):  # TODO: finish this.
     window = QtWidgets.QWidget()
     pass
+
 
 class ItemList(QtWidgets.QListWidget):
     all_items = []
     shown_items = []
 
-    def __init__(self, l=[], multiple_selection=False):
+    def __init__(self, inputList=None, multiple_selection=False):
         QtWidgets.QListWidget.__init__(self)
+        if inputList is None:
+            inputList = []
 
         # Create the list widget
-        self.shown_items = l
-        self.all_items = l
+        self.shown_items = inputList
+        self.all_items = inputList
         self.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
         if multiple_selection:
             self.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
 
-    def set_list(self, l):
+    def set_list(self, inputList):
         self.clear()
-        for item in l:
+        for item in inputList:
             self.addItem(item)
 
 
