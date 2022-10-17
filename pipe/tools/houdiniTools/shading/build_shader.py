@@ -4,6 +4,7 @@ from socket import TCP_NODELAY
 import hou 
 import os 
 import pathlib
+from pipe.pipeHandlers.environment import Environment as env
 
 #This class gets the name of an asset from a selected material library node, 
 #then builds a basic shading network based on that information. 
@@ -217,7 +218,7 @@ class BuildShader():
             #displacement
             pxrDisplace = matLib.createNode("pxrdisplace")
             #note: this is just a starting place. you'll likely have to adjust it manually furthur)
-            pxrDisplace.parm("dispAmount").set("0.015")
+            pxrDisplace.parm("dispAmount").set("0.5")
             outputCollect.setInput(1,pxrDisplace,0)
             pxrDispTransform = matLib.createNode("pxrdisptransform")
             #this is assuming your displacement map has a midpoint of 0.5 
@@ -277,8 +278,4 @@ class BuildShader():
             self.ImportTextureFile(roughness, "Roughness")
             self.ImportTextureFile(normal, "Normal")
             self.ImportTextureFile(height, "Height")
-        hou.ui.displayMessage("Finished building " + self.purpose + " shader for " +self.shaderName+".",buttons=("Okay",),title="Error")
-
-buildShader = BuildShader()
-buildShader.DefineAssetInfo()
-buildShader.ShaderBuild()
+        hou.ui.displayMessage("Finished building " + self.purpose + " shader for " +self.shaderName+".",buttons=("Okay",),title="Success!")

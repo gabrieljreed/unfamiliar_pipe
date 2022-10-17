@@ -62,39 +62,9 @@ class TexDelete():
                 texFilesCleared = 1
                 counter+=1
         print("Deleted " + str(counter) + " tex files for " + assetName + ".")
-        
+        hou.ui.displayMessage("Deleted " + str(counter) + " tex files for " + assetName + ".",buttons=("Okay",),title="Success!")
+
         if(texFilesCleared == 0):
             print("No tex files found to delete. Closing tool.")
-    
-texDelete = TexDelete()
-path = texDelete.GetAssetName()[1]
-assetName = texDelete.GetAssetName()[0]
-texDelete.ClearTex(path,assetName)
-
-
-
-
-
-'''
-import hou
-
-EXR = '.<UDIM>.exr'
-TEX = '_srgblin_acescg.<UDIM>.exr.tex'
-MATNET = hou.node('/stage/pxr_maggie')
-
-def changePath(matNet, end):
-    children = matNet.children()
-
-    for child in children:
-        if child.type().name() == 'pxrtexture::3.0' or child.type().name() == 'pxrnormalmap::3.0':
-            filepath = child.parm('filename').eval()
-            if (end == 'TEX'):
-                filepath = filepath.replace(EXR, TEX)
-            elif (end == 'EXR'):
-                filepath = filepath.replace(TEX, EXR)
-            else:
-                hou.ui.diplayMessage('invalid input')
-            child.parm('filename').set(filepath)
-            
-changePath(MATNET, 'TEX')
-'''
+            hou.ui.displayMessage("No tex files found to delete. Closing "+
+            "tool.",buttons=("Okay",),title="Error")

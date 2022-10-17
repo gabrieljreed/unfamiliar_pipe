@@ -3,7 +3,7 @@ import hou
 import pipe.pipeHandlers.gui as gui
 from pipe.pipeHandlers.environment import Environment as env
 
-#This class makes a gui for decided which shader to edit as well as making the 
+#This class makes a gui for deciding which shader to edit as well as making the 
 #correct editing LOP node network
 class EditShader():
 
@@ -49,7 +49,7 @@ class EditShader():
         if (self.ASSET_TYPE != 'previs'):
             if (self.ASSET_TYPE != 'prod'):
                 hou.ui.displayMessage("Invaild asset type. Please try again")
-                print(self.ASSET_TYPE)
+                #print(self.ASSET_TYPE)
                 return False
         return True
         
@@ -112,8 +112,14 @@ class EditShader():
         assignMat.parm("matspecpath1").set("/materials/" + SHADER_TYPE + "_" + ASSET_NAME)
         assignMat.setInput(0, ref, 0)
 
+        renderGeoSet = objectViewer.createNode("rendergeometrysettings")
+        #set up displacement
+        renderGeoSet.parm("xn__primvarsriattributesdisplacementboundsphere_control_6occkr").set("set")
+        renderGeoSet.parm("xn__primvarsriattributesdisplacementboundsphere_5bcckr").set(1.0)
+        renderGeoSet.setInput(0,assignMat,0)
+
         output = hou.node(objectViewer.path() + "/output0")
-        output.setInput(0, assignMat, 0)
+        output.setInput(0, renderGeoSet, 0)
         output.setDisplayFlag(True)
 
         #Set up usd rop for export
@@ -127,8 +133,8 @@ class EditShader():
         for matLibNode in matLibNodes:
             #get all children
             matLibChildren = matLibNode.children()
-            print("matLibChildren")
-            print(matLibChildren)
+            #print("matLibChildren")
+            #print(matLibChildren)
             #get asset name from material library node name
             assetName = matLibNode.name().replace("pxr_","")
 
@@ -165,7 +171,7 @@ class EditShader():
                     pxrTexNodes.append(node)
             #fix each filepath
             for texNode in pxrTexNodes:
-                print("fixing a filepath in a pxrtexture")
+                #print("fixing a filepath in a pxrtexture")
                 #check that filename hasn't already been fixed
                 if(texNode.parm("filename").eval().startswith("./textures")):
                     ogFilename = texNode.parm("filename").eval()
@@ -175,14 +181,14 @@ class EditShader():
             #get usduvtextures 
             usdUvNodes = []
             for node in matLibChildren:
-                print(node.type())
+                #print(node.type())
                 if("usduvtexture::2.0" in str(node.type())):
                     usdUvNodes.append(node)
-            print(usdUvNodes)
+            #print(usdUvNodes)
 		    
             #fix each filepath
             for uvNode in usdUvNodes:
-                print("fixing a usd uv texture node")
+                #print("fixing a usd uv texture node")
                 #activate filename parameter
                 uvNode.parm("__activate__file").set(1)
                 #activate scale and bias(for displacement)

@@ -55,7 +55,3 @@ class TxmakeRepath():
                     self.UpdateFilename(texNode,filenameParm,"_srgbtex_acescg.png.tex")
                 elif("Normal" in filenameParm or "SpecularRoughness" in filenameParm):
                     self.UpdateFilename(texNode,filenameParm,"_data_acescg.png.tex")
-
-txmakeRepath = TxmakeRepath()
-nodes = txmakeRepath.GetNodesToUpdate()
-txmakeRepath.RepathTextures(nodes)

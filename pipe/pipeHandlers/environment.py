@@ -7,6 +7,7 @@ class Environment:
     ASSET_DIR = '/production/assets'
     SHOT_DIR = '/production/shots'
     ICON_DIR = '/icons'
+    RIG_DIR = '/production/rigs'
 
     #Sets the project directory as defined in the MEDIA_PROJECT_DIR envrionment variable
     def __init__(self):
