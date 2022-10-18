@@ -14,7 +14,6 @@ import os
 
 
 def select_from_list(list, parent):  # TODO: finish this.
-    window = QtWidgets.QWidget()
     pass
 
 
@@ -48,18 +47,22 @@ class SelectFromList(QtWidgets.QDialog):
     '''
     submitted = QtCore.Signal(list)
 
-    def __init__(self, parent=None, title="Select", l=[], multiple_selection=False, width=600, height=600):
+    def __init__(self, parent=None, title="Select", inputList=None, multiple_selection=False, width=600, height=600):
         super(SelectFromList, self).__init__(parent)
+        if inputList is None:
+            inputList = []
+
         if parent:
             self.parent = parent
-        self.list = l
+
+        self.list = inputList
         self.values = []
         self.multiple_selection = multiple_selection
         self.case_sensitive = False
 
         self.setWindowTitle(title)
         self.setObjectName('SelectFromList')
-        self.resize(width,height)
+        self.resize(width, height)
         self.initializeVBox()
         self.setLayout(self.vbox)
         self.show()
@@ -183,10 +186,10 @@ class SelectFromMultipleLists(SelectFromList):
     submitted = QtCore.Signal(object)
 
     def __init__(self, parent=None, title="Select from Multiple", lists=[], multiple_selection=False):
-        #SelectFromList.__init__(self, parent=parent, title=title, multiple_selection=multiple_selection)
+        # SelectFromList.__init__(self, parent=parent, title=title, multiple_selection=multiple_selection)
         QtWidgets.QWidget.__init__(self)
         self.setObjectName('SelectFromMultipleLists')
-        self.resize(600,600)
+        self.resize(600, 600)
         self.setWindowTitle(title)
         self.lists = lists
         self.multiple_selection = multiple_selection
@@ -207,15 +210,15 @@ class SelectFromMultipleLists(SelectFromList):
 
     def initializeDropdown(self):
         self.comboBox = QtWidgets.QComboBox()
-        for label in self.labels:#[::-1]:
+        for label in self.labels:  # [::-1]:
             print("adding label {0}".format(label))
             self.comboBox.addItem(label)
         self.comboBox.currentIndexChanged.connect(self.switchList)
         self.vbox.addWidget(self.comboBox)
 
     def indexFromLabel(self, label):
-        for i, l in enumerate(self.labels):
-            if l==label:
+        for i, loopLabel in enumerate(self.labels):
+            if loopLabel == label:
                 return i
 
     def switchList(self, index, init=False):
