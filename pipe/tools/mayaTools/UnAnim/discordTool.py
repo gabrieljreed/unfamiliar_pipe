@@ -85,7 +85,7 @@ gt_mtod_settings = {
     'custom_username': '',
     'image_format': 'jpg',
     'video_format': 'mp4',
-    'video_scale_pct': 40,
+    'video_scale_pct': 100,
     'video_compression': 'Animation',
     'video_output_type': 'qt',
     'is_new_instance': True,
@@ -143,6 +143,9 @@ signatures = [
     "live from the Rancheritos funeral",
     "inside a white van",
     "via a hotspot duct taped to a fish",
+    "begging Geremy Mustard to watch our film",
+    "picking Craig in the Craig vs Jaren fight",
+    "picking Jaren in the Craig vs Jaren fight",
 ]
 
 
@@ -827,7 +830,8 @@ def build_gui_maya_to_discord():
                 # temp_path = generate_temp_file(gt_mtod_settings.get('video_format'), file_name=current_scene_name)
                 temp_path = generate_temp_file("mov", file_name=current_scene_name)
                 disable_buttons()  # This needs to happen before creating the playblast to avoid multiple clicks
-                temp_playblast_file = capture_playblast_animation(temp_path, gt_mtod_settings.get('video_scale_pct'),
+                # ANCHOR call to capture_playblast_animation
+                temp_playblast_file = capture_playblast_animation(temp_path, gt_mtod_settings.get('video_scale_pct'),  
                                                                   gt_mtod_settings.get('video_compression'),
                                                                   gt_mtod_settings.get('video_output_type'))
 
@@ -1837,11 +1841,11 @@ def discord_post_attachment(username, message, file_path, webhook_url):
     return response
 
 
-def capture_playblast_animation(video_file, scale_pct, compression, video_format):
+def capture_playblast_animation(video_file, scale_pct, compression, video_format):  # ANCHOR capture_playblast_animation
     """
     Records a playblast and returns its path.
     It also prints the size of the file to the active viewport as a heads-up message (cmds.inViewMessage)
-            
+
     Args:
         video_file (str): A path for the file that will be generated (playblast file)
         scale_pct (int): Int to determine the scale of the playblast image (percentage)
@@ -1852,7 +1856,7 @@ def capture_playblast_animation(video_file, scale_pct, compression, video_format
         playblast (str): Returns the path for the generated video file
     """
 
-    playblast = cmds.playblast(p=scale_pct, f=video_file, compression=compression, format=video_format,
+    playblast = cmds.playblast(p=100, f=video_file, compression=compression, format=video_format,
                                forceOverwrite=True, v=False)
 
     outputFile = playblast.replace(".mov", ".mp4")

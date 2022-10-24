@@ -29,7 +29,8 @@ class EditShader():
     #Starts the gui for choosing asset
     def itemSelectGui(self):
         #Intilize gui with the asset list
-        self.item_gui = gui.SelectFromList(l=self.asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to shade")
+        #self.item_gui = gui.SelectFromList(l=self.asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to shade")
+        self.item_gui = gui.SelectFromList(inputList=self.asset_list, parent=hou.ui.mainQtWindow(), title="Select an asset to shade")
         #Send results from gui to the results method
         self.item_gui.submitted.connect(self.results)
 

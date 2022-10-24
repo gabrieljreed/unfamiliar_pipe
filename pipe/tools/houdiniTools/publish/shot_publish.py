@@ -16,7 +16,7 @@ class ShotPublish:
     #Starts the gui for publishing shots
     def publish(self):
         #Intilize gui with the shot list
-        self.item_gui = gui.SelectFromList(l=self.shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to publish")
+        self.item_gui = gui.SelectFromList(inputList=self.shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to publish")
         #Send results from gui to the results method
         self.item_gui.submitted.connect(self.results)
 

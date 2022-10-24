@@ -14,7 +14,7 @@ class ShotCheckout:
     #Starts the gui for checking out shots
     def checkout(self):
         #Intilize gui with the shot list
-        self.item_gui = gui.SelectFromList(l=self.shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to checkout")
+        self.item_gui = gui.SelectFromList(inputList=self.shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to checkout")
         #Send results from gui to the results method
         self.item_gui.submitted.connect(self.results)
 

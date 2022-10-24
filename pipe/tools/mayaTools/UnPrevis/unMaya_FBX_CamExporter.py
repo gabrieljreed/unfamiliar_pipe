@@ -5,6 +5,8 @@ import maya.mel as mel
 
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Element as umEl
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Environment as umEnv
+import pipe.pipeHandlers.permissions as permissions
+
 
 class Camera_Exporter:
     def __init__(self):
@@ -235,10 +237,7 @@ class Camera_Exporter:
 
         if not self.dir_exists(filepath):
             os.mkdir(filepath)
-            try:
-                os.chmod(filepath, mode=0o770)
-            except Exception as e:
-                print("Unable to change permissions on version directory")     
+            permissions.set_permissions(filepath)
 
         if withFile:
             self.houdini_filepath_noExt = filepath + "/camera_main"
@@ -287,29 +286,21 @@ class Camera_Exporter:
             curr_filepath = curr_filepath + "/" + self.subsequence + "/" + self.UNREAL_EXPORTS_FOLDER
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                try:
-                    os.chmod(curr_filepath, mode=0o770)
-                except Exception as e:
-                    print("Unable to change permissions on version directory")    
+                permissions.set_permissions(curr_filepath)
             
             #inserts the "camera" directory into the path
             curr_filepath = curr_filepath + "/" + self.CAM_DIR
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                try:
-                    os.chmod(curr_filepath, mode=0o770)
-                except Exception as e:
-                    print("Unable to change permissions on version directory")              
+
+                permissions.set_permissions(curr_filepath)
 
             #inserts the specific shot directory into the path
             curr_filepath = curr_filepath + "/" + self.shot_selection 
             if not self.dir_exists(curr_filepath):
                 os.mkdir(curr_filepath)
-                try:
-                    os.chmod(curr_filepath, mode=0o770)
-                except Exception as e:
-                    print("Unable to change permissions on version directory")            
-
+                
+                permissions.set_permissions(curr_filepath)
     
             return curr_filepath
     
@@ -398,13 +389,10 @@ class Camera_Exporter:
         new_cam = self.new_houdini_cam
         
         mel.eval(command)
-        try:
-            os.chmod(self.houdini_filepath, mode=0o770)
-        except Exception as e:
-            print("Unable to change permissions on version directory")            
 
+        permissions.set_permissions(self.houdini_filepath)
         
-        #delete duplicate camera
+        # delete duplicate camera
         cmds.select(new_cam)
         cmds.delete()
         
@@ -451,10 +439,8 @@ class Camera_Exporter:
 
         ##mel.eval('FBXExport -f "'+path+'" -s')
         mel.eval('FBXExport -f "'+self.unreal_filepath+'" -s')
-        try:
-            os.chmod(self.unreal_filepath, mode=0o777)
-        except Exception as e:
-            print("Unable to change permissions on version directory")     
+
+        permissions.set_permissions(self.unreal_filepath)
 
         #delete duplicate camera
         cmds.select(new_unreal_cam)

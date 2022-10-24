@@ -5,6 +5,7 @@ import os, shutil
 
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Element as umEl
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Environment as umEnv
+import pipe.pipeHandlers.permissions as permissions
 
 
 class UnMaya_Alembic_Exporter():
@@ -24,7 +25,8 @@ class UnMaya_Alembic_Exporter():
     def check_if_selected(self):
         curr_selection = cmds.ls(selection=True)
         if len(curr_selection) == 0:
-            confirm = cmds.confirmDialog ( title='WARNING', message="Nothing is selected", button=['Ok'], defaultButton='Ok', dismissString='Other' )
+            confirm = cmds.confirmDialog(title='WARNING', message="Nothing is selected", button=['Ok'],
+                                         defaultButton='Ok', dismissString='Other')
             if confirm == "Ok":
                 pass
         else:
@@ -40,7 +42,7 @@ class UnMaya_Alembic_Exporter():
         object_list = ["singe", "maggie", "kelleth", "other"]
     
         if cmds.window("ms_selectObject_GUI", exists=True):
-                cmds.deleteUI("ms_selectObject_GUI")
+            cmds.deleteUI("ms_selectObject_GUI")
 
         win = cmds.window("ms_selectObject_GUI", title="SELECT OBJECT GUI") 
         cmds.showWindow(win)
@@ -240,11 +242,10 @@ class UnMaya_Alembic_Exporter():
         #Copy alembic into the new directory and rename it
         new_file_path = new_dir_path + "/" + self.el.get_file_parent_name() + self.el.get_file_extension()
         shutil.copy(self.el.filepath, new_file_path)
-        try:
-            os.chmod(self.el.filepath, mode=0o770)
-            os.chmod(new_file_path, mode=0o770)
-        except Exception as e:
-            print("Unable to update permissions on alembic files")
+
+        # Set permissions
+        permissions.set_permissions(self.el.filepath)
+        permissions.set_permissions(new_file_path)
     
     #updates the element file with the comment
     def update_element_file(self):

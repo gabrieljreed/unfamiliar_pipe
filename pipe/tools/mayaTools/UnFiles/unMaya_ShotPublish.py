@@ -4,6 +4,7 @@ import os, shutil, functools, time
 
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Environment as umEnv
 from pipe.tools.mayaTools.UnMaya_PipeHandlers import unMaya_Element as umEl
+import pipe.pipeHandlers.permissions as permissions
 
 #This class publishes the shot back to the pipe. This includes version control
 class UnMaya_ShotPublish:
@@ -115,11 +116,10 @@ class UnMaya_ShotPublish:
           
                 #Copy most recent version file into the current file
                 shutil.copy(version_filepath, fullNamePath)
-                #Make sure permissions are properly set
-                try:
-                    os.chmod(fullNamePath, mode=0o770)
-                except Exception as e:
-                    print("Unable to update permissions on shot file")
+
+                # Make sure permissions are properly set
+                permissions.set_permissions(fullNamePath)
+
             except Exception as e:
                 print("Unable to revert to most recent version")
             self.quit_shot("CHECKIN")                            
@@ -222,10 +222,9 @@ class UnMaya_ShotPublish:
         #Make hidden directory with version number
         new_dir_path = os.path.join(self.curr_env.get_file_dir(self.el.filepath), dir_name)
         os.mkdir(new_dir_path)
-        try:
-            os.chmod(new_dir_path, mode=0o770)
-        except Exception as e:
-            print("Unable to change permissions on version directory")
+
+        # Set permissions
+        permissions.set_permissions(new_dir_path)
         
         #If current file is not the shot file, then copy the current file into the shot_main of the new shot
         if curr_fileName != dest_fileName:
@@ -233,10 +232,9 @@ class UnMaya_ShotPublish:
             print("current filepath:", curr_filePath)
             print("new dir path:", self.el.filepath)
             shutil.copy(curr_filePath, self.el.filepath)
-            try:
-                os.chmod(self.el.filepath, mode=0o770)
-            except Exception as e:
-                print("Unable to change permissions on shot file")
+
+            # Set permissions
+            permissions.set_permissions(self.el.filepath)
         
         #Copy current .mb file into new directory and rename it
         new_file_path = new_dir_path + '/' + self.el.get_file_parent_name() + self.el.get_file_extension()

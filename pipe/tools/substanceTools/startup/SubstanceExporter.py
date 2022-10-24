@@ -1,12 +1,16 @@
 from PySide2 import QtWidgets, QtCore
+
 import substance_painter.ui
 import substance_painter.export
 import substance_painter.project
 import substance_painter.textureset
+
 import os
 import sys
 sys.path.append(r"G:\unfamiliar\anim_pipeline")
+
 import pipe.pipeHandlers.environment as unEnv
+import pipe.pipeHandlers.permissions as permissions
 
 plugin_widgets = []
 window = None
@@ -82,7 +86,7 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
         self.button.clicked.connect(self.publish)
         # self.button.clicked.connect(self.export_textures)
         self.mainLayout.addWidget(self.button)
-    
+
     def search(self):
         search_term = self.searchBox.text()
         self.list_widget.clear()
@@ -100,29 +104,24 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
             print(f"Asset directory {assetDir} does not exist")
             QtWidgets.QMessageBox.warning(self, "Asset not found", "The asset you selected doesn't exist. Please select a valid asset.")
             return
-        
+
         texturesDir = os.path.join(assetDir, "materials", "textures")
         if not os.path.exists(texturesDir):
             os.makedirs(texturesDir)
             # Set permissions on the folder
-            os.chmod(texturesDir, 0o777)
+            permissions.set_permissions(texturesDir)
 
         # Export textures
         self.export_textures(export_path=texturesDir)
 
-        # Change permissions 
-        for root, dirs, files in os.walk(assetDir):
-            for file in files:
-                try:
-                    os.chmod(os.path.join(root, file), 0o777)
-                except Exception as e:
-                    print("Unable to change permissions on file: {}".format(os.path.join(root, file)))
+        # Change permissions
+        permissions.set_permissions(assetDir)
 
     def export_textures(self, export_path=None):
         if not substance_painter.project.is_open():
             QtWidgets.QMessageBox.warning(self, "No project open", "Please open a project before exporting textures.")
             return
-        
+
         # Get the currently active layer stack (paintable)
         stack = substance_painter.textureset.get_active_stack()
 
@@ -131,7 +130,7 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
         PBRMR_preset = substance_painter.resource.import_project_resource(
             r"G:\unfamiliar\anim_pipeline\pipe\tools\substanceTools\resources\PBRMR.spexp", 
             substance_painter.resource.Usage.EXPORT)
-        
+
         RMAN_preset = substance_painter.resource.import_project_resource(
             r"G:\unfamiliar\anim_pipeline\pipe\tools\substanceTools\resources\RMAN.spexp",
             substance_painter.resource.Usage.EXPORT)
@@ -179,30 +178,26 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
         except Exception as e:
             error = True
             print(e)
-            QtWidgets.QMessageBox.warning(self, "Error", 
+            QtWidgets.QMessageBox.warning(self, "Error",
             "An error occurred while exporting PBRMR textures. Please check the console for more information.")
-        
+
         try:
             substance_painter.export.export_project_textures(RMAN_config)
             print(f"Exported RMAN textures to {Path}")
         except Exception as e:
             error = True
             print(e)
-            QtWidgets.QMessageBox.warning(self, "Error", 
+            QtWidgets.QMessageBox.warning(self, "Error",
             "An error occurred while exporting RMAN textures. Please check the console for more information.")
 
         # Change permissions
-        for root, dirs, files in os.walk(Path):
-            for file in files:
-                try:
-                    os.chmod(os.path.join(root, file), 0o777)
-                except Exception as e:
-                    print("Unable to change permissions on file: {}".format(os.path.join(root, file)))
-        
+        permissions.set_permissions(Path)
+
         if error:
             QtWidgets.QMessageBox.warning(self, "Error", "An error occurred while exporting textures. Please check the console for more information.")
             return
         QtWidgets.QMessageBox.information(self, "Export complete", "Textures exported successfully.")
+
 
 def launch_exporter():
     # Check for existing windows and close them before opening a new one

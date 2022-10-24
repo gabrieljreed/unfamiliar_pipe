@@ -218,7 +218,7 @@ class BuildShader():
             #displacement
             pxrDisplace = matLib.createNode("pxrdisplace")
             #note: this is just a starting place. you'll likely have to adjust it manually furthur)
-            pxrDisplace.parm("dispAmount").set("0.5")
+            pxrDisplace.parm("dispAmount").set("0.25")
             outputCollect.setInput(1,pxrDisplace,0)
             pxrDispTransform = matLib.createNode("pxrdisptransform")
             #this is assuming your displacement map has a midpoint of 0.5 
@@ -227,6 +227,15 @@ class BuildShader():
             pxrDisplace.setInput(1,pxrDispTransform,1)
             displacement = matLib.createNode("pxrtexture","displacement_pxrtexture")
             pxrDispTransform.setInput(0,displacement,1)
+
+            ###############DELETE LATER###########################3
+            remap = matLib.createNode("pxrremap")
+            remap.parm("inputMax").set(0.1)
+            remap.setInput(0,diffuseColor,0)
+            pxrSurface.setInput(2,remap,0)
+            #######################################################
+
+
             #layout nodes inside material library
             matLib.layoutChildren()
 

@@ -2,7 +2,7 @@ from functools import partial
 import maya.cmds as cmds
 
 props = ['kelleth_doll', 'maggie_doll', 'singe_doll', 'wand', 'ring', 'ring_box', 'flower_vase', 'frog', 'kelleth_doll_head']
-parent_grp = ['dolls:kelleth_doll_main_CTRL_GRP','dolls:maggie_doll_main_CTRL_GRP', 'dolls:singe_main_CTRL_GRP', 'wand_global_ctrl_grp_01', '4', '5', '6','7', 'kelleth_doll_main:head_broken_const_grp']
+parent_grp = ['kelleth_doll_main:kelleth_doll_main_CTRL_GRP','maggie_doll_main:maggie_doll_main_CTRL_GRP', 'singe_doll_main:singe_main_CTRL_GRP', 'wand_main:wand_global_ctrl_grp_01', '4', '5', '6','7', 'kelleth_doll_main:head_broken_const_grp']
 active_parent = parent_grp[0]
 active_const = 'Parent'
 offset = False

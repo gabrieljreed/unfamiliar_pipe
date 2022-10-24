@@ -10,6 +10,8 @@ from PySide2.QtGui import *
 import maya.cmds as mc
 import maya.mel as mm
 
+import pipe.pipeHandlers.permissions as permissions
+
 
 # RIG_PATH = "/groups/unfamiliar/anim_pipeline/production/rigs"
 RIG_PATH = os.path.join(os.environ["MEDIA_PROJECT_DIR"], "production", "rigs")
@@ -100,22 +102,6 @@ class RigPublish(QDialog):
         elif self.propRadioButton.isChecked():
             return "prop"
 
-    @staticmethod
-    def setPermissions(path):
-        for root, dirs, files in os.walk(path):
-            for dir in dirs:
-                try:
-                    os.chmod(os.path.join(root, dir), 0o777)
-                except Exception as e:
-                    print(f"Unable to change permissions on folder: {os.path.join(root, dir)}")
-                    print(e)
-            for file in files:
-                try:
-                    os.chmod(os.path.join(root, file), 0o777)
-                except Exception as e:
-                    print(f"Unable to change permissions on file: {os.path.join(root, dir)}")
-                    print(e)
-
     def createNewRig(self):
         # Ask the user what to name the new rig
         rigName, ok = QInputDialog.getText(self, "New Rig Name", "Enter a name for the new rig")
@@ -180,7 +166,7 @@ class RigPublish(QDialog):
         versionsFolder = os.path.join(rigPath, "versions")
         if not os.path.exists(versionsFolder):
             os.mkdir(versionsFolder)
-            os.chmod(versionsFolder, 0o777)
+            permissions.set_permissions(versionsFolder)
 
         # Edit the versions file
         versionsFile = None
@@ -222,7 +208,7 @@ class RigPublish(QDialog):
 
         # Set the permissions on the new rig
         print("Setting permissions on new rig...")
-        self.setPermissions(rigPath)
+        permissions.set_permissions(rigPath)
 
         QMessageBox.information(self, "Rig Published", f"Rig {rigName} has been published")
 
@@ -355,13 +341,8 @@ def publish():
     rigFile = os.path.join(rigFolder, "{}_main.mb".format(rig))
     mc.file(rigFile, exportAll=True, type="mayaBinary", force=True, constructionHistory=True, preserveReferences=True)
 
-    # Change permissions 
-    for root, dirs, files in os.walk(rigFolder):
-        for file in files:
-            try:
-                os.chmod(os.path.join(root, file), 0o777)
-            except Exception as e:
-                print("Unable to change permissions on file: {}".format(os.path.join(root, file)))
+    # Change permissions
+    permissions.set_permissions(rigFolder)
 
     successMessage = "// Result: " + rigFile.replace("\\", "/")
     mm.eval('print("' + successMessage + '")')
