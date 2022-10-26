@@ -1,5 +1,6 @@
 from ast import If
 from cgi import test
+from email.mime import base
 from socket import TCP_NODELAY
 import hou 
 import os 
@@ -230,7 +231,7 @@ class BuildShader():
 
             ###############DELETE LATER###########################3
             remap = matLib.createNode("pxrremap")
-            remap.parm("inputMax").set(0.1)
+            remap.parm("inputMax").set(0.25)
             remap.setInput(0,diffuseColor,0)
             pxrSurface.setInput(2,remap,0)
             #######################################################
@@ -249,6 +250,10 @@ class BuildShader():
             outputCollect.setInput(0,usdPrevSurface,0)
             #base color
             baseColor = matLib.createNode("usduvtexture::2.0","diffuse_color_usduvtexture")
+            #############TEMP FIX FOR COLOR SPACE ISSUE####################
+            baseColor.parm("scaler").set(3)
+            baseColor.parm("scaleg").set(3)
+            baseColor.parm("scaleb").set(3)
             baseColor.setInput(1,usdPrimvarReader,0)
             usdPrevSurface.setInput(0,baseColor,4)
             #metallic

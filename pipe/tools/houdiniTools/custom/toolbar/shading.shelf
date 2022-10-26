@@ -38,37 +38,38 @@ editShader.assetSelect()]]></script>
   <tool name="Build Shader" label="Build Shader" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[import hou
 import importlib
-import pipe.tools.houdiniTools.shading.build_shader as curTool
-importlib.reload(curTool)
+import pipe.tools.houdiniTools.shading.build_shader as BuildShader
+importlib.reload(BuildShader)
 
-from pipe.tools.houdiniTools.shading.build_shader import BuildShader
 
-buildShader = BuildShader()
-hou.session.buildShader = buildShader]]></script>
+buildShader = BuildShader.BuildShader()
+hou.session.buildShader = buildShader
+buildShader.DefineAssetInfo()
+buildShader.ShaderBuild()]]></script>
   </tool>
 
   <tool name="Txmake Repath" label="Txmake Repath" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[import hou
 import importlib
-import pipe.tools.houdiniTools.shading.txmake_repath as curTool
-importlib.reload(curTool)
+import pipe.tools.houdiniTools.shading.txmake_repath as TxmakeRepath
+importlib.reload(TxmakeRepath)
 
-from pipe.tools.houdiniTools.shading.txmake_repath import TxmakeRepath
-
-txmakeRepath = TxmakeRepath()
-hou.session.txmakeRepath = txmakeRepath]]></script>
+txmakeRepath = TxmakeRepath.TxmakeRepath()
+hou.session.txmakeRepath = txmakeRepath
+nodes = txmakeRepath.GetNodesToUpdate()
+txmakeRepath.RepathTextures(nodes)]]></script>
   </tool>
 
   <tool name="Tex Delete" label="Tex Delete" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[import hou
 import importlib
-import pipe.tools.houdiniTools.shading.tex_delete as curTool
-importlib.reload(curTool)
+import pipe.tools.houdiniTools.shading.tex_delete as TexDelete
+importlib.reload(TexDelete)
 
-from pipe.tools.houdiniTools.shading.tex_delete import TexDelete
-
-texDelete = TexDelete()
+texDelete = TexDelete.TexDelete()
 hou.session.texDelete = texDelete
-]]></script>
+path = texDelete.GetAssetName()[1]
+assetName = texDelete.GetAssetName()[0]
+texDelete.ClearTex(path,assetName)]]></script>
   </tool>
 </shelfDocument>
