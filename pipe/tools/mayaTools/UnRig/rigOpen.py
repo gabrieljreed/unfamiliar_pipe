@@ -120,6 +120,8 @@ class OpenRig(QtWidgets.QDialog):
 
         mc.file(os.path.join(rigFolder, rigFile), open=True, force=True)
 
+        self.close()
+
 
 class mayaRun:
     def run(self):
