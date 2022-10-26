@@ -62,3 +62,13 @@ class Environment:
         # TODO: This could be more robust and is a little too hard coded rn
         hip_dir = self.get_shot_dir() + '/' + shot_name + '/' + shot_name + '_main.hipnc'
         return hip_dir
+
+    def get_rig_dir(self):
+        """Gets the rig directory"""
+        rig_dir = self.project_dir + self.RIG_DIR
+        return rig_dir
+
+    def get_rig_prop_dir(self):
+        """Gets the rig prop directory"""
+        rig_prop_dir = self.get_rig_dir() + '/props'
+        return rig_prop_dir
