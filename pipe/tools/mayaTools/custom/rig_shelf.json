@@ -4,12 +4,22 @@
 	"shelfItems":[
 		{
 			"itemType":"button",
-			"icon":"load.png",
+			"icon":"save.png",
 			"annotation":"Publish Rig",
 			"label":"Rig Publish",
 			"menu":0,
 			"double-click":"",
 			"tool":"mayaTools.UnRig.rigPublish",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"load.png",
+			"annotation":"Open Rig",
+			"label":"Open Rig",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnRig.rigOpen",
 			"function":"mayaRun.run()"
 		}
     ]

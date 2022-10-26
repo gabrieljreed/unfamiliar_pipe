@@ -35,12 +35,22 @@
 		{
 			"itemType":"button",
 			"icon":"YarnDollLogo.png",
-			"annotation":"Reference Dolls Rig",
-			"label":"DOLLS",
+			"annotation":"Reference Prop Rig",
+			"label":"PROPS",
 			"menu":0,
 			"double-click":"",
-			"tool":"mayaTools.UnAnim.reference",
-			"function":"reference.rig('dolls')"
+			"tool":"mayaTools.UnAnim.referenceProp",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"ring.png",
+			"annotation":"Launch prop animate UI",
+			"label":"Prop Animate",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.propScript",
+			"function":"mayaRun.run()"
 		},
 		{
 			"itemType":"button",
@@ -134,8 +144,18 @@
 		},
 		{
 			"itemType":"button",
+			"icon":"animBot.png",
+			"annotation":"Launch animBot plugin",
+			"label":"AnimBot",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.loadAnimbot",
+			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
 			"icon":"MLP_Discord.png",
-			"annotation":"Launch Discord tool (still in development)",
+			"annotation":"Launch Discord tool",
 			"label":"Discord",
 			"menu":0,
 			"double-click":"",
@@ -144,12 +164,12 @@
 		},
 		{
 			"itemType":"button",
-			"icon":"animBot.png",
-			"annotation":"Launch animBot plugin",
-			"label":"AnimBot",
+			"icon":"playblast.svg",
+			"annotation":"Playblaster",
+			"label":"Playblaster",
 			"menu":0,
 			"double-click":"",
-			"tool":"mayaTools.UnAnim.loadAnimbot",
+			"tool":"mayaTools.UnAnim.playblastExporter",
 			"function":"mayaRun.run()"
 		}
     ]

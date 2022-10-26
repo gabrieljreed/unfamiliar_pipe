@@ -17,6 +17,8 @@ class PlayblastExporter(QtWidgets.QMainWindow):
         self.videoScalePct = 100
         self.videoCompression = "Animation"
         self.videoOutputType = "qt"
+        self.width = 1920
+        self.height = 1080
 
         self.env = env.Environment()
         self.baseDir = os.path.abspath(os.path.join(self.env.project_dir, os.pardir, "Editing", "Animation"))
@@ -120,7 +122,7 @@ class PlayblastExporter(QtWidgets.QMainWindow):
 
         try:
             mc.playblast(f=fileName, forceOverwrite=True, viewer=False, percent=self.videoScalePct,
-                         format=self.videoFormat, compression=self.videoCompression)
+                         format=self.videoFormat, compression=self.videoCompression, widthHeight = [self.width, self.height])
 
             # Set permissions
             permissions.set_permissions(f"{fileName}.mov")
