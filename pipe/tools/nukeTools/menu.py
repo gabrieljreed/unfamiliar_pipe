@@ -10,8 +10,7 @@ topLevelMenu = nuke.menu('Nuke')
 unNukeMenu = topLevelMenu.addMenu('unNuke')
 
 unNukeMenu.addCommand("Test", "import sys; nuke.message(str(sys.path))")
-# unNukeMenu.addCommand('Shot Checkout', 'checkout.shot_checkout.ShotCheckout().checkout()')
-unNukeMenu.addCommand("Shot Checkout", "import checkout.shot_checkout; checkout.shot_checkout.ShotCheckout().checkout()")
-# unNukeMenu.addCommand('Shot Checkout', lambda: import pipe; pipe.pipeTools.nukeTools.checkout.shot_checkout.ShotCheckout().checkout())
+unNukeMenu.addCommand("Shot Checkout", """import checkout.shot_checkout; ui = checkout.shot_checkout.ShotCheckout();
+ui.show()""")
 
 # Add custom formats here if you want I guess

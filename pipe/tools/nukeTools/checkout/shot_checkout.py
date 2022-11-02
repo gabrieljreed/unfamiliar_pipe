@@ -1,11 +1,66 @@
 from pipe.pipeHandlers.environment import Environment as env
-import pipe.pipeHandlers.gui as gui
 from pipe.pipeHandlers.element import Element
+from PySide2 import QtWidgets, QtCore
+
+import PySide2.QtWidgets as QtWidgets
 
 import nuke
 
 
-class ShotCheckout:
+class ShotCheckout(QtWidgets.QMainWindow):
+    def __init__(self) -> None:
+        super().__init__()
+        self.env = env()
+        self.shots = self.env.get_shot_list()
+        self.shots.sort()
+        self.setupUI()
+        self.updateUI()
+
+    def setupUI(self):
+        self.setWindowTitle("Checkout Shot")
+
+        self.mainWidget = QtWidgets.QWidget()
+        self.mainLayout = QtWidgets.QVBoxLayout(self.mainWidget)
+        self.setCentralWidget(self.mainWidget)
+
+        self.mainLayout.addWidget(QtWidgets.QLabel("Shot:"))
+
+        self.searchBox = QtWidgets.QLineEdit()
+        self.searchBox.setPlaceholderText("Search")
+        self.searchBox.textEdited.connect(self.search)
+        self.mainLayout.addWidget(self.searchBox)
+
+        self.shotList = QtWidgets.QListWidget()
+        self.shotList.setAlternatingRowColors(True)
+        self.shotList.addItems(self.shots)
+        self.mainLayout.addWidget(self.shotList)
+
+        self.buttonBox = QtWidgets.QHBoxLayout()
+        self.mainLayout.addLayout(self.buttonBox)
+
+        self.checkoutButton = QtWidgets.QPushButton("Checkout")
+        self.checkoutButton.clicked.connect(self.checkout)
+        self.buttonBox.addWidget(self.checkoutButton)
+
+        self.cancelButton = QtWidgets.QPushButton("Cancel")
+        self.cancelButton.clicked.connect(self.close)
+        self.buttonBox.addWidget(self.cancelButton)
+
+    def updateUI(self):
+        self.shotList.clear()
+        self.shotList.addItems(self.shots)
+
+    def search(self):
+        """Updates the list of shots to only show the ones that match the search query"""
+        searchTerm = self.searchBox.text()
+        self.shotList.clear()
+        self.shotList.addItems([shot for shot in self.shots if searchTerm in shot])
+
+    def checkout(self):
+        print("Checkout")
+
+
+class ShotCheckoutOld:
     """This class holds required functions to check out shots in Nuke"""
 
     def __init__(self):
@@ -15,12 +70,9 @@ class ShotCheckout:
     def checkout(self):
         """Starts the gui for checking out shots"""
         # Open gui to select shot file
-        self.filePath = nuke.getFilename('Select a shot to checkout', '*.txt *.xml')
-
-        # Intilize gui with the shot list
-        # self.item_gui = gui.SelectFromList(l=self.shot_list, parent=hou.ui.mainQtWindow(), title="Select a shot to checkout")
-        # Send results from gui to the results method
-        # self.item_gui.submitted.connect(self.results)
+        self.filePath = nuke.getFilename('Select a shot to checkout', '*.txt *.xml', default=env().get_shot_dir())
+        print(self.filePath)
+        QtWidgets.QMessageBox.information(None, "Shot Checkout", self.filePath)
 
     def results(self, value):
         """Called after the user interacts with the gui"""
