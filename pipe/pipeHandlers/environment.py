@@ -63,6 +63,11 @@ class Environment:
         hip_dir = self.get_shot_dir() + '/' + shot_name + '/' + shot_name + '_main.hipnc'
         return hip_dir
 
+    def get_nuke_dir(self, shot_name):
+        """Gets the nuke directory from a shot name"""
+        nuke_dir = os.path.join(self.get_shot_dir(), shot_name, shot_name + '_main.nk')
+        return nuke_dir
+
     def get_rig_dir(self):
         """Gets the rig directory"""
         rig_dir = self.project_dir + self.RIG_DIR

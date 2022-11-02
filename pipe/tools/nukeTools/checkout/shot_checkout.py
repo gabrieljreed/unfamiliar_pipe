@@ -1,8 +1,11 @@
 from pipe.pipeHandlers.environment import Environment as env
 from pipe.pipeHandlers.element import Element
-from PySide2 import QtWidgets, QtCore
+import pipe.pipeHandlers.permissions as permissions
 
 import PySide2.QtWidgets as QtWidgets
+
+import os
+from PySide2 import QtWidgets, QtCore
 
 import nuke
 
@@ -33,6 +36,7 @@ class ShotCheckout(QtWidgets.QMainWindow):
         self.shotList = QtWidgets.QListWidget()
         self.shotList.setAlternatingRowColors(True)
         self.shotList.addItems(self.shots)
+        self.shotList.itemDoubleClicked.connect(self.checkout)
         self.mainLayout.addWidget(self.shotList)
 
         self.buttonBox = QtWidgets.QHBoxLayout()
@@ -57,7 +61,36 @@ class ShotCheckout(QtWidgets.QMainWindow):
         self.shotList.addItems([shot for shot in self.shots if searchTerm in shot])
 
     def checkout(self):
-        print("Checkout")
+        if self.shotList.currentItem() is None:
+            return
+
+        shot = self.shotList.currentItem().text()
+
+        nukeFilePath = self.env.get_nuke_dir(shot)
+
+        if not os.path.isdir(os.path.dirname(nukeFilePath)):
+            # FIXME: This doesn't seem to be getting triggered properly
+            os.makedirs(os.path.dirname(nukeFilePath))
+            permissions.set_permissions(os.path.dirname(nukeFilePath))
+
+        versionsFolder = os.path.join(os.path.dirname(nukeFilePath), ".versions")
+        if not os.path.isdir(versionsFolder):
+            os.makedirs(versionsFolder)
+            permissions.set_permissions(versionsFolder)
+
+        element = Element(nukeFilePath)
+
+        if element.is_assigned():
+            if element.get_assigned_user() != env().get_username():
+                nuke.message("Shot is checked out by: " + element.get_assigned_user())
+                return
+        nuke.message("Shot checked out by: " + env().get_username())
+
+        element.assign_user(env().get_username())
+        element.write_element_file()
+
+        # Open nuke file
+        # TODO: Open nuke file
 
 
 class ShotCheckoutOld:
