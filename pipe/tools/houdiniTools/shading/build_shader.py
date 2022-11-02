@@ -101,15 +101,7 @@ class BuildShader():
 
         #create the path from the base and the asset name 
         self.filePath = BASE_PATH + self.shaderName + MAT_PATH
-        
-        '''
-        #prod or previs?
-        if(self.shaderName.startswith("pxr_")):
-            self.set_purpose("prod")
-        elif(self.shaderName.startswith("unreal_")):
-            self.set_purpose("previs")
-        '''
-
+    
         #access first file in folder to determine file format and if it uses udims 
         testFile = os.listdir(self.filePath)[0]
 
@@ -229,11 +221,17 @@ class BuildShader():
             displacement = matLib.createNode("pxrtexture","displacement_pxrtexture")
             pxrDispTransform.setInput(0,displacement,1)
 
-            ###############DELETE LATER###########################3
+            ###############DELETE LATER###########################
             remap = matLib.createNode("pxrremap")
             remap.parm("inputMax").set(0.25)
             remap.setInput(0,diffuseColor,0)
             pxrSurface.setInput(2,remap,0)
+
+            remapSpecFace = matLib.createNode("pxrremap")
+            remapSpecFace.parm("inputMax").set(0.25)
+            remapSpecFace.setInput(0,specFaceColor,0)
+            pxrSurface.setInput(9,remapSpecFace,0)
+
             #######################################################
 
 

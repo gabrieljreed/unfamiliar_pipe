@@ -11,6 +11,7 @@
     <memberTool name="Build Shader"/>
     <memberTool name="Txmake Repath"/>
     <memberTool name="Tex Delete"/>
+    <memberTool name="Execute ROPS"/>
   </toolshelf>
 
   <tool name="edit_geo" label="Edit Model" icon="PLASMA_App">
@@ -71,5 +72,15 @@ hou.session.texDelete = texDelete
 path = texDelete.GetAssetName()[1]
 assetName = texDelete.GetAssetName()[0]
 texDelete.ClearTex(path,assetName)]]></script>
+  </tool>
+
+  <tool name="Execute ROPS" label="Execute ROPs" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+
+propLayout = hou.node("/obj/prop_layout")
+
+for node in hou.sopNodeTypeCategory().nodeType("rop_fbx").instances():
+    #print(node)
+    node.parm("execute").pressButton()]]></script>
   </tool>
 </shelfDocument>

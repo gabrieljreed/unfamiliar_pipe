@@ -11,6 +11,12 @@ class EditShader():
         #Get asset list
         self.ASSET_PATH = env().get_asset_dir()
         self.asset_list = env().get_asset_list()
+        self.PREVIS_INPUT = '1'
+        self.PROD_INPUT = '2'
+        self.BOTH_INPUT = '3'
+        self.PREVIS_INPUT_STRING = 'previs'
+        self.PROD_INPUT_STRING = 'prod'
+        self.BOTH_INPUT_STRING = 'both'
         
         
     #This Function lets you manually build the shader network by passing paramters rather than
@@ -37,26 +43,41 @@ class EditShader():
 
     #Is called after the user interacts with the gui
     def results(self, value):
-        self.ASSET_NAME = value[0]
-        #Get asset type
-        if(self.assetType()):
-            #Create the node network
-            self.createNodeNetwork()
-        
-    
-    #Gets asset type from user input
+      self.ASSET_NAME = value[0]
+      #Get asset type
+      asset_type = self.assetType()
+      if asset_type is not None:
+        #Create the node network
+        if asset_type == self.BOTH_INPUT:
+          self.createNodeNetwork('previs')
+          self.createNodeNetwork('prod')
+        elif asset_type == self.PREVIS_INPUT:
+          self.createNodeNetwork('previs')
+        elif asset_type == self.PROD_INPUT:
+          self.createNodeNetwork('prod')
+          
+      
+      #Gets asset type from user input
     def assetType(self):
-        self.ASSET_TYPE = hou.ui.readInput("Input \'previs\' or \'prod\'")[1]
-        if (self.ASSET_TYPE != 'previs'):
-            if (self.ASSET_TYPE != 'prod'):
-                hou.ui.displayMessage("Invaild asset type. Please try again")
-                #print(self.ASSET_TYPE)
-                return False
-        return True
+      asset_type = hou.ui.readInput("Valid inputs: \n \'%s\' or \'previs\',\n \'%s\' or \'prod\', \n \'%s\' or \'both\'" % (self.PREVIS_INPUT, self.PROD_INPUT, self.BOTH_INPUT))[1]
+
+      #set so string input still workd
+      if asset_type == self.PREVIS_INPUT_STRING:
+        asset_type = self.PREVIS_INPUT
+      elif asset_type == self.PROD_INPUT_STRING:
+        asset_type = self.PROD_INPUT
+      elif asset_type == self.BOTH_INPUT_STRING:
+        asset_type = self.BOTH_INPUT
+
+      if (asset_type != self.PREVIS_INPUT and asset_type != self.PROD_INPUT and asset_type != self.BOTH_INPUT):
+        hou.ui.displayMessage("Invaild asset type. Please try again")
+        print(asset_type)
+        return None
+      return asset_type
         
         
-    def createNodeNetwork(self):
-        ASSET_TYPE = self.ASSET_TYPE
+    def createNodeNetwork(self, asset_type):
+        ASSET_TYPE = asset_type
         ASSET_NAME = self.ASSET_NAME
         ASSET_PATH = self.ASSET_PATH + '/'
 
