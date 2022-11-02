@@ -210,7 +210,15 @@ class RigPublish(QDialog):
         print("Setting permissions on new rig...")
         permissions.set_permissions(rigPath)
 
-        QMessageBox.information(self, "Rig Published", f"Rig {rigName} has been published")
+        messageBox = QMessageBox(self)
+        messageBox.setText(f"Rig {rigName} has been published")
+        messageBox.setWindowTitle("Rig Published")
+        openOutputFolderButton = messageBox.addButton("Open Output Folder", QMessageBox.AcceptRole)
+        openOutputFolderButton.clicked.connect(lambda: os.system('xdg-open "%s"' % os.path.dirname(rigFile)))
+        openOutputFolderButton.clicked.connect(self.close)
+        closeButton = messageBox.addButton("Close", QMessageBox.RejectRole)
+        closeButton.clicked.connect(self.close)
+        messageBox.exec_()
 
 
 def publish():
@@ -346,6 +354,14 @@ def publish():
 
     successMessage = "// Result: " + rigFile.replace("\\", "/")
     mm.eval('print("' + successMessage + '")')
+
+    messageBox = QMessageBox(self)
+    messageBox.setText("Playblast exported successfully!")
+    openOutputFolderButton = messageBox.addButton("Open Output Folder", QMessageBox.AcceptRole)
+    openOutputFolderButton.clicked.connect(lambda: os.system('xdg-open "%s"' % os.path.dirname(rigFolder)))
+    openOutputFolderButton.clicked.connect(self.close)
+    closeButton = messageBox.addButton("Close", QMessageBox.RejectRole)
+    messageBox.exec_()
 
 
 class mayaRun:
