@@ -223,17 +223,16 @@ class BuildShader():
 
             ###############DELETE LATER###########################
             remap = matLib.createNode("pxrremap")
-            remap.parm("inputMax").set(0.25)
+            remap.parm("inputMax").set(1)
             remap.setInput(0,diffuseColor,0)
             pxrSurface.setInput(2,remap,0)
 
             remapSpecFace = matLib.createNode("pxrremap")
-            remapSpecFace.parm("inputMax").set(0.25)
+            remapSpecFace.parm("inputMax").set(1)
             remapSpecFace.setInput(0,specFaceColor,0)
             pxrSurface.setInput(9,remapSpecFace,0)
 
             #######################################################
-
 
             #layout nodes inside material library
             matLib.layoutChildren()

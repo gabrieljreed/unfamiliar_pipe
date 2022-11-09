@@ -5,17 +5,15 @@ class PropClusterSetup():
 
     def __init__(self):
         #CHANGE THESE TWO VARIABLES TO POINT AT YOUR IMPORT AND EXPORT LOCATIONS
-        self.importFilePath = "/groups/unfamiliar/shading/Anna/ceiling/CeilingUSD"
-        self.exportFilePath = "/groups/unfamiliar/shading/Anna/ceiling/CeilingFBX"
+        self.importFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenTable/KitchenTableUSD"
+        self.exportFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenTable/KitchenTableFBX"
+        self.clusterName = "KitchenTable"
 
     def BuildCluster(self):
         stage = hou.node("/stage")
+        obj = hou.node("/obj")
         #create container geo node 
-        containerNode = stage.createNode("sopnet",node_name="prop_layout")
-        #print(containerNode)
-        #containerNode.allowEditingOfContents()
-        null = containerNode.createNode("null")
-        null.destroy()
+        containerNode = obj.createNode("geo",node_name="prop_layout")
         #create merge node
         mergeNode = containerNode.createNode("merge")
 
@@ -25,36 +23,40 @@ class PropClusterSetup():
 
         for file in filesToImport:
             #create file node
-            curFileNode = containerNode.createNode("file",str(file)+"GEO")
-            curFileNode.parm("file").set(self.importFilePath+"/"+str(file))
+            print("file = " + str(file))
+            FileNode = containerNode.createNode("file",str(file)+"GEO")
+            FileNode.parm("file").set(self.importFilePath+"/"+str(file))
 
-            curGeoName = file.replace("prod_","")
-            curGeoName = curGeoName.replace(".usd","")
-            #print(curGeoName)
+            GeoName = file.replace("prod_","")
+            GeoName = GeoName.replace(".usd","")
+            #print(GeoName)
 
-            curUnpackNode = containerNode.createNode("unpackusd::2.0")
-            curUnpackNode.parm("output").set(1)
-            curUnpackNode.setInput(0,curFileNode,0)
+            unpack = containerNode.createNode("unpackusd::2.0")
+            unpack.parm("output").set(1)
+            unpack.setInput(0,FileNode,0)
 
-            curUnwrapNode = containerNode.createNode("uvunwrap")
-            curUnwrapNode.setInput(0,curUnpackNode,0)
+            unwrap = containerNode.createNode("uvunwrap")
+            unwrap.setInput(0,unpack,0)
 
-            curUvLayoutNode = containerNode.createNode("uvlayout")
-            curUvLayoutNode.setInput(0,curUnwrapNode,0)
+            uvLayout = containerNode.createNode("uvlayout")
+            uvLayout.setInput(0,unwrap,0)
 
-            curAttCr = containerNode.createNode("attribcreate")
-            curAttCr.parm("type1").set("index")
-            curAttCr.parm("name1").set("shop_materialpath")
-            curAttCr.parm("class1").set("primitive")
-            curAttCr.parm("string1").set(curGeoName)
-            curAttCr.setInput(0,curUvLayoutNode)
+            attCr = containerNode.createNode("attribcreate")
+            attCr.parm("type1").set("index")
+            attCr.parm("name1").set("shop_materialpath")
+            attCr.parm("class1").set("primitive")
+            attCr.parm("string1").set(GeoName)
+            attCr.setInput(0,uvLayout,0)
 
-            curRop = containerNode.createNode("rop_fbx")
-            curRop.parm("sopoutput").set(self.exportFilePath+"/"+curGeoName+".fbx")
-            curRop.setInput(0,curAttCr,0)
-            curRop.parm("execute").pressButton()
+            softenNormals = containerNode.createNode("labs::soften_normals")
+            softenNormals.setInput(0,attCr,0)
 
-            mergeNode.setInput(counter,curAttCr,0)
+            rop = containerNode.createNode("rop_fbx")
+            rop.parm("sopoutput").set(self.exportFilePath+"/"+GeoName+".fbx")
+            rop.setInput(0,softenNormals,0)
+            rop.parm("execute").pressButton()
+
+            mergeNode.setInput(counter,softenNormals,0)
             counter+=1
 
         alignDist = containerNode.createNode("align_and_distribute")
@@ -63,21 +65,18 @@ class PropClusterSetup():
         alignDist.setInput(0,mergeNode,0)
         alignDist.setDisplayFlag(True)
 
-        output = containerNode.createNode("output","OUT_PROP_LAYOUT")
-        output.setInput(0,alignDist,0)
+        subdivide = containerNode.createNode("subdivide")
+        subdivide.setInput(0,alignDist,0)
+
+        output = containerNode.createNode("output", self.clusterName + "_prop_layout")
+        output.setInput(0,subdivide,0)
         output.setDisplayFlag(True)
 
         finalRop = containerNode.createNode("rop_fbx")
-        finalRop.parm("sopoutput").set(self.exportFilePath+"/prop_layout.fbx")
-        finalRop.setInput(0,alignDist,0)
+        finalRop.parm("sopoutput").set(self.exportFilePath+"/" + self.clusterName + "_prop_layout.fbx")
+        finalRop.setInput(0,output,0)
         finalRop.parm("execute").pressButton()
-
-        #visualize lol. pretty sure there is a viewport bug happening here
-        #so ... this is the workaround
-        #rip
-        viewer = stage.createNode("sopimport","VIEWER")
-        viewer.parm("soppath").set("/stage/"+containerNode.name()+"/OUT_PROP_LAYOUT/")
-
+        
         #layout nodes
         containerNode.layoutChildren()
         stage.layoutChildren()

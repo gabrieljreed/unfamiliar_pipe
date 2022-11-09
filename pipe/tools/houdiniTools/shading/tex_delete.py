@@ -52,8 +52,13 @@ class TexDelete():
 
     def ClearTex(self,PATH,assetName):
         texFilesCleared = 0
+        #count files 
+        texCounter = 0
+        for file in os.listdir(PATH):
+            if file.endswith(".tex"):
+                texCounter+=1
         #WAIT ARE YOU REALLY SURE
-        self.ConfirmChoice("About to delete tex files for " + assetName + ". Are you sure?","Clearing tex files")
+        self.ConfirmChoice("About to delete " + texCounter + " tex files for " + assetName + ". Are you sure?","Clearing tex files")
         counter = 0
         for file in os.listdir(PATH):
             if file.endswith(".tex"):

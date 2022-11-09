@@ -37,6 +37,7 @@ if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
         #Add the correct anim_name and publish the USD
         unanim.parm('anim_name').set("singe")
         unanim.parm('publish_button').pressButton()
+        unanim.hdaModule().animUpdate(unanim)
     else:
         hou.ui.displayMessage("No animation has been published for " + anim)
 else:
@@ -68,6 +69,7 @@ if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
         #Add the correct anim_name and publish the USD
         unanim.parm('anim_name').set(anim)
         unanim.parm('publish_button').pressButton()
+        unanim.hdaModule().animUpdate(unanim)
     else:
         hou.ui.displayMessage("No animation has been published for " + anim)
 else:
@@ -99,6 +101,7 @@ if hip.find('/groups/unfamiliar/anim_pipeline/production/shots/') != -1:
         #Add the correct anim_name and publish the USD
         unanim.parm('anim_name').set(anim)
         unanim.parm('publish_button').pressButton()
+        unanim.hdaModule().animUpdate(unanim)
     else:
         hou.ui.displayMessage("No animation has been published for " + anim)
 else:
