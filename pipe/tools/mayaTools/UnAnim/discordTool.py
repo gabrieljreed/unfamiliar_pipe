@@ -146,6 +146,7 @@ signatures = [
     "begging Geremy Mustard to watch our film",
     "picking Craig in the Craig vs Jaren fight",
     "picking Jaren in the Craig vs Jaren fight",
+    "perchance",
 ]
 
 
@@ -547,8 +548,17 @@ def build_gui_maya_to_discord():
             username = username[0] + ' ' + username[2]
         else:
             username = username[0] + ' ' + username[1]
+
+        if "Jaren" in username:
+            username = "Craig van Dyke"
+
         # Get a random entry in the list of signatures
         signature = random.choice(signatures)
+
+        if "Chance" in username:
+            username = "perchance"
+            signature = "perchance"
+
         return "{} ({})".format(username, signature)
         return user_name
 

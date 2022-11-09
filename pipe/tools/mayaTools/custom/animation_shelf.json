@@ -171,6 +171,16 @@
 			"double-click":"",
 			"tool":"mayaTools.UnAnim.playblastExporter",
 			"function":"mayaRun.run()"
+		},
+		{
+			"itemType":"button",
+			"icon":"warning.png",
+			"annotation":"Crash Logger",
+			"label":"Crash Logger",
+			"menu":0,
+			"double-click":"",
+			"tool":"mayaTools.UnAnim.crashLogger",
+			"function":"mayaRun.run()"
 		}
     ]
 }
