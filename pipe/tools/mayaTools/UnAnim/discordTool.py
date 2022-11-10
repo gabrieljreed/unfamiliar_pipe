@@ -38,7 +38,10 @@ import maya.OpenMayaUI as OpenMayaUI
 
 import subprocess
 import getpass
-import pwd
+
+import sys
+if sys.platform == "linux" or sys.platform == "linux2":
+    import pwd
 import threading
 import logging
 import base64
@@ -48,7 +51,6 @@ import mimetypes
 import random
 import string
 import copy
-import sys
 import os
 from json import dumps
 from json import loads
@@ -542,7 +544,10 @@ def build_gui_maya_to_discord():
         else:
             user_name = gt_mtod_settings.get('custom_username') + ' (' + socket.gethostname() + ')'
 
-        username = pwd.getpwuid(os.getuid())[4]
+        if sys.platform == "linux" or sys.platform == "linux2":
+            username = pwd.getpwuid(os.getuid())[4]
+        elif sys.platform == "win32":
+            username = os.getlogin()[0]
         username = username.split(" ")
         if len(username) == 3:
             username = username[0] + ' ' + username[2]

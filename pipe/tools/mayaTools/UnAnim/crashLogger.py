@@ -2,9 +2,13 @@ import http
 import http.client
 import json
 import os
-import pwd
+import random
+import sys
+if sys.platform == "linux" or sys.platform == "linux2":
+    import pwd
 import threading
 from time import sleep
+from pipe.tools.mayaTools.UnAnim.discordTool import signatures
 
 import maya.cmds as mc
 from PySide2 import QtCore, QtWidgets
@@ -13,7 +17,7 @@ from PySide2 import QtCore, QtWidgets
 class CrashLogger(QtWidgets.QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.webhook = "https://discord.com/api/webhooks/1022539010209484830/Oaxafq6CnXuQChclGJyB80ROTF6kaVR5XDNs9OM-oq3TtuLofk1IVD3XwoS6EeEHpQMV"
+        self.webhook = "https://discord.com/api/webhooks/1040041492481314866/vpktRXLph_zpzJswvzVD3SeYs2JjwJFegkYFIysCP2cZ9HKg6iIdLFf9Z-OcTZYwObrX"
         self.setupUI()
 
     def setupUI(self):
@@ -89,14 +93,19 @@ class CrashLogger(QtWidgets.QMainWindow):
 
     @staticmethod
     def getUsername():
-        username = pwd.getpwuid(os.getuid())[4]
+        if sys.platform == "linux" or sys.platform == "linux2":
+            username = pwd.getpwuid(os.getuid())[4]
+        elif sys.platform == "win32":
+            username = os.getlogin()
         username = username.split(" ")
         if len(username) == 3:
             username = username[0] + ' ' + username[2]
-        else:
+        elif len(username) == 2:
             username = username[0] + ' ' + username[1]
+        else:
+            username = username[0]
 
-        return username
+        return str(username)
 
     @staticmethod
     def getEvalMode():
@@ -121,13 +130,13 @@ class CrashLogger(QtWidgets.QMainWindow):
 
     def submit(self):
         uploadMessage = f"""Artist Name: {self.artistNameLineEdit.text()}
-Evaluation Mode: {self.evaluationModeComboBox.currentText()}
-Maggie Rig: {self.maggieRigCheckBox.isChecked()}
-Singe Rig: {self.singeRigCheckBox.isChecked()}
-Kelleth Rig: {self.kellethRigCheckBox.isChecked()}
-Frog Rig: {self.frogRigCheckBox.isChecked()}
-Dolls Rig: {self.dollsRigCheckBox.isChecked()}
-Layout Loaded: {self.layoutLoadedCheckBox.isChecked()}
+Evaluation Mode: `{self.evaluationModeComboBox.currentText()}`
+Maggie Rig: `{self.maggieRigCheckBox.isChecked()}`
+Singe Rig: `{self.singeRigCheckBox.isChecked()}`
+Kelleth Rig: `{self.kellethRigCheckBox.isChecked()}`
+Frog Rig: `{self.frogRigCheckBox.isChecked()}`
+Dolls Rig: `{self.dollsRigCheckBox.isChecked()}`
+Layout Loaded: `{self.layoutLoadedCheckBox.isChecked()}`
 Additional Comments: {self.additionalCommentsTextEdit.toPlainText()}"""
         print(uploadMessage)
 
@@ -135,7 +144,7 @@ Additional Comments: {self.additionalCommentsTextEdit.toPlainText()}"""
             try:
                 self.setEnabled(False)
                 self.submitButton.setText("Uploading...")
-                self.upload(uploadMessage)
+                self.upload("username", uploadMessage)
                 self.submitButton.setText("Submit")
                 self.setEnabled(True)
             except Exception as e:
@@ -149,9 +158,14 @@ Additional Comments: {self.additionalCommentsTextEdit.toPlainText()}"""
 
         # self.close()
 
-    def upload(self, message):
+    def upload(self, username, message):
         """Upload the given message to the server.
         @param message: The message to upload."""
+        import pipe.tools.mayaTools.UnAnim.requests as requests
+        data = {"username": f"{self.getUsername()} ({random.choice(signatures)})", "content": message}
+        response = requests.post(self.webhook, json=data)
+        print(response)
+        return
 
         try:
             bot_message = {
