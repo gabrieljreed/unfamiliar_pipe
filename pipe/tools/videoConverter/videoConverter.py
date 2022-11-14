@@ -65,7 +65,7 @@ class VideoConverter(QtWidgets.QWidget):
         self.convertButton.clicked.connect(self.convertButtonClicked)
 
         # Specify bitrate 
-        self.bitrate = 1000
+        self.bitrate = 5000
         # Bitrate UI 
         self.bitrateWidget = QtWidgets.QWidget(self)
         self.bitrateWidget.setObjectName('bitrateWidget')
