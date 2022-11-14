@@ -4,21 +4,41 @@ import json
 import os
 import random
 import sys
+
+import maya.cmds as cmds
+
 if sys.platform == "linux" or sys.platform == "linux2":
     import pwd
+
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.append(os.path.dirname(__file__))
 import threading
 from time import sleep
-from pipe.tools.mayaTools.UnAnim.discordTool import signatures
 
 import maya.cmds as mc
 from PySide2 import QtCore, QtWidgets
+
+from pipe.tools.mayaTools.UnAnim.discordTool import signatures
 
 
 class CrashLogger(QtWidgets.QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.webhook = "https://discord.com/api/webhooks/1040041492481314866/vpktRXLph_zpzJswvzVD3SeYs2JjwJFegkYFIysCP2cZ9HKg6iIdLFf9Z-OcTZYwObrX"
+        self.webhook = ""
+        self.load_webhooks()
         self.setupUI()
+
+    # Load in the webhooks from the webhooks.json file
+    def load_webhooks(self):
+        """ Loads in the webhooks from the webhooks.json file """
+        webhooks_file = os.path.join(os.path.dirname(__file__), "__private", 'webhooks.json')
+        print(webhooks_file)
+        print(os.path.exists(webhooks_file))
+        if os.path.exists(webhooks_file):
+            with open(webhooks_file, 'r') as f:
+                self.webhook = json.loads(f.read())["crashLogger"]
+        else:
+            cmds.warning('webhooks.json file not found')
 
     def setupUI(self):
         self.setWindowTitle("Crash Logger")
@@ -162,47 +182,9 @@ Additional Comments: {self.additionalCommentsTextEdit.toPlainText()}"""
         """Upload the given message to the server.
         @param message: The message to upload."""
         import pipe.tools.mayaTools.UnAnim.requests as requests
-        data = {"username": f"{self.getUsername()} ({random.choice(signatures)})", "content": message}
+        data = {"username": f"{self.artistNameLineEdit.text()} ({random.choice(signatures)})", "content": message}
         response = requests.post(self.webhook, json=data)
         print(response)
-        return
-
-        try:
-            bot_message = {
-                "username": "Rigging Bot",
-                "content": message
-            }
-            host, path = parse_discord_api(self.webhook)
-            connection = http.client.HTTPSConnection(host)
-            connection.request('POST', path, headers={'Content-Type': 'application/json; charset=UTF-8',
-                                                      'User-Agent': 'BYU Animation/1.0.0'},
-                               body=json.dumps(bot_message))
-            response = connection.getresponse()
-            return tuple([response])
-        except Exception as e:
-            raise e
-
-
-def parse_discord_api(discord_webhook_full_path):
-    """ Parses and returns two strings to be used with HTTPSConnection instead of Http()
-
-    Args:
-        discord_webhook_full_path (str): Discord Webhook (Full Path)
-
-    Returns:
-        discord_api_host (str): Only the host used for discord's api
-        discord_api_repo (str): The rest of the path used to describe the webhook
-    """
-    path_elements = discord_webhook_full_path.replace('https://', '').replace('http://', '').split('/')
-    repo = ''
-    if len(path_elements) == 1:
-        raise Exception('Failed to parse Discord Webhook path.')
-    else:
-        host = path_elements[0]
-        for path_part in path_elements:
-            if path_part != host:
-                repo += '/' + path_part
-        return host, repo
 
 
 class mayaRun:
