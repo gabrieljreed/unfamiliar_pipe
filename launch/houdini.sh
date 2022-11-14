@@ -24,9 +24,6 @@ export HOUDINI_DESK_PATH=${HOUDINI_MENU_PATH}
 export HOUDINI_TOOLBAR_PATH=${HOUDINI_TOOLS}"/custom/toolbar;&"
 export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"/icons;&"
 
-#Update HSITE for startup script
-export HSITE=${HOUDINI_TOOLS}"/custom/HSITE/houdini19.0;&"
-
 #Add path to hda assets
 export HOUDINI_OTLSCAN_PATH=${HOUDINI_TOOLS}"/custom/hda;&"
 

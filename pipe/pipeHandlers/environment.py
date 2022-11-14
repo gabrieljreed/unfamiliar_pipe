@@ -65,7 +65,7 @@ class Environment:
 
     def get_nuke_dir(self, shot_name):
         """Gets the nuke directory from a shot name"""
-        nuke_dir = os.path.join(self.get_shot_dir(), shot_name, shot_name + '_main.nk')
+        nuke_dir = os.path.join(self.get_shot_dir(), shot_name, "nuke", shot_name + '_main.nk')
         return nuke_dir
 
     def get_rig_dir(self):

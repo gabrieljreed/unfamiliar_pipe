@@ -5,9 +5,9 @@ class PropClusterSetup():
 
     def __init__(self):
         #CHANGE THESE TWO VARIABLES TO POINT AT YOUR IMPORT AND EXPORT LOCATIONS
-        self.importFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenTable/KitchenTableUSD"
-        self.exportFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenTable/KitchenTableFBX"
-        self.clusterName = "KitchenTable"
+        self.importFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenFloor/KitchenFloorUSD"
+        self.exportFilePath = "$HIP/KitchenFloorFBX"
+        self.clusterName = "KitchenFloor"
 
     def BuildCluster(self):
         stage = hou.node("/stage")
@@ -23,7 +23,7 @@ class PropClusterSetup():
 
         for file in filesToImport:
             #create file node
-            print("file = " + str(file))
+            #print("file = " + str(file))
             FileNode = containerNode.createNode("file",str(file)+"GEO")
             FileNode.parm("file").set(self.importFilePath+"/"+str(file))
 
