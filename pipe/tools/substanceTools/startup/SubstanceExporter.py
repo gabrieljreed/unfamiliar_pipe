@@ -36,7 +36,7 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
         Env = unEnv.Environment()
         self.assets = Env.get_asset_list()
 
-        self.assetsDir = r"G:\unfamiliar\anim_pipeline\production\assets"
+        self.assetsDir = Env.get_asset_dir()
 
         self.setupUI()
 
@@ -81,11 +81,25 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
         self.list_widget.addItems(self.assets)
         self.mainLayout.addWidget(self.list_widget)
 
+        # Add a combo box to the dialog 
+        self.texture_size_label = QtWidgets.QLabel("Texture size:")
+        self.mainLayout.addWidget(self.texture_size_label)
+
+        self.size_combo_box = QtWidgets.QComboBox()
+        self.size_combo_box.addItems(["128", "256", "512", "1024", "2048", "4096", "8192"])
+        self.size_combo_box.setCurrentText("2048")
+        self.mainLayout.addWidget(self.size_combo_box)
+
         # Add a button to the dialog
+        self.buttonBox = QtWidgets.QHBoxLayout()
         self.button = QtWidgets.QPushButton("Publish")
         self.button.clicked.connect(self.publish)
-        # self.button.clicked.connect(self.export_textures)
-        self.mainLayout.addWidget(self.button)
+        self.buttonBox.addWidget(self.button)
+        self.cancelButton = QtWidgets.QPushButton("Cancel")
+        self.cancelButton.clicked.connect(self.close)
+        self.buttonBox.addWidget(self.cancelButton)
+
+        self.mainLayout.addLayout(self.buttonBox)
 
     def search(self):
         search_term = self.searchBox.text()
@@ -127,18 +141,15 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
 
         material = stack.material()
 
-        PBRMR_preset = substance_painter.resource.import_project_resource(
-            r"G:\unfamiliar\anim_pipeline\pipe\tools\substanceTools\resources\PBRMR.spexp", 
+        # TODO: Replace these with relative paths
+        resource_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, "resources"))
+        PBRMR_preset = substance_painter.resource.import_project_resource(os.path.join(resource_dir, "PBRMR.spexp"),
             substance_painter.resource.Usage.EXPORT)
 
-        RMAN_preset = substance_painter.resource.import_project_resource(
-            r"G:\unfamiliar\anim_pipeline\pipe\tools\substanceTools\resources\RMAN.spexp",
+        RMAN_preset = substance_painter.resource.import_project_resource(os.path.join(resource_dir, "RMAN.spexp"),
             substance_painter.resource.Usage.EXPORT)
 
         resolution = material.get_resolution()
-
-        # Path = substance_painter.project.file_path()  # TODO: Replace with the asset path
-        # Path = os.path.dirname(Path) + "/textures/"
 
         Path = export_path
         if not Path.endswith("/"):
@@ -152,8 +163,12 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
             "defaultExportPreset" 	: PBRMR_preset.identifier().url(),
             "exportParameters" 		: [
                 {
-                    "parameters"	: { "paddingAlgorithm": "infinite" }
-                }
+                    "parameters"	: 
+                        {
+                            "paddingAlgorithm": "infinite" ,
+                            "sizeLog2" : self.size_combo_box.currentIndex() + 7,
+                        }
+                    }
             ]
         }
 
@@ -165,7 +180,11 @@ class SubstanceExporterWindow(QtWidgets.QMainWindow):
             "defaultExportPreset" 	: RMAN_preset.identifier().url(),
             "exportParameters" 		: [
                 {
-                    "parameters"	: { "paddingAlgorithm": "infinite" }
+                    "parameters"	: 
+                        { 
+                            "paddingAlgorithm": "infinite",
+                            "sizeLog2" : self.size_combo_box.currentIndex() + 7,
+                        }
                 }
             ]
         }
