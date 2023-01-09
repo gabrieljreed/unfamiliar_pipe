@@ -4,11 +4,13 @@ import os
 class PropClusterSetup():
 
     def __init__(self):
-        #CHANGE THESE TWO VARIABLES TO POINT AT YOUR IMPORT AND EXPORT LOCATIONS
-        self.importFilePath = "/groups/unfamiliar/shading/Anna/AssetsUnclaimed/KitchenFloor/KitchenFloorUSD"
-        self.exportFilePath = "$HIP/KitchenFloorFBX"
-        self.clusterName = "KitchenFloor"
-
+        #CHANGE THESE TWO VARIABLES
+        self.clusterName = "Walls"
+        self.artistName = "Anna"
+        self.importFilePathAbs = "/groups/unfamiliar/shading/" + self.artistName + "/" + self.clusterName + "/" + self.clusterName + "USD/"
+        self.importFilePath = "$HIP/" + self.clusterName + "USD"
+        self.exportFilePath = "$HIP/" + self.clusterName + "FBX"
+        
     def BuildCluster(self):
         stage = hou.node("/stage")
         obj = hou.node("/obj")
@@ -18,7 +20,7 @@ class PropClusterSetup():
         mergeNode = containerNode.createNode("merge")
 
         #pull the files from the folder into a list of files 
-        filesToImport = os.listdir(self.importFilePath)
+        filesToImport = os.listdir(self.importFilePathAbs)
         counter = 0
 
         for file in filesToImport:

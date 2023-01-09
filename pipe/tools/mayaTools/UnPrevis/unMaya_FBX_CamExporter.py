@@ -273,7 +273,10 @@ class Camera_Exporter:
             subsequence_list = sorted(subsequence_list)
             self.subsequence = ""
             for element in subsequence_list:
-                element_dict = self.split_subsequence_name(element)
+                try:
+                    element_dict = self.split_subsequence_name(element)
+                except:
+                    continue 
                 if element_dict["SEQ"] != "none":
                     if shot_sections[1] >= element_dict["START"]:
                         if shot_sections[1] <= element_dict["END"]:
