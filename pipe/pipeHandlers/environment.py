@@ -4,6 +4,7 @@ import functools
 
 class Environment:
     """ This class allows easy access to various environment information """
+    # TODO: This does not need to be a class
 
     PROJECT_ENV = 'MEDIA_PROJECT_DIR'
     ASSET_DIR = '/production/assets'
@@ -33,7 +34,15 @@ class Environment:
     def get_shot_list(self):
         """Gets a list of all shot names"""
         shot_list = os.listdir(self.get_shot_dir())
+        shot_list.sort()
         return shot_list
+
+    def get_shots_from_sequence(self, sequence):
+        """Gets a list of all the shots in a given sequence"""
+        shots = os.listdir(self.get_shot_dir())
+        shots = [shot for shot in shots if shot.startswith(sequence)]
+        shots.sort()
+        return shots
 
     def get_icon_dir(self):
         """Gets the icon directory (needed for gui.py but I haven't looked in to why that is)"""
@@ -42,6 +51,7 @@ class Environment:
 
     def get_file_dir(self, filepath):
         """Gets the directory holding the file specified in the filepath argument"""
+        # TODO: This should just be replaced across the codebase with os.path.dirname
         file_dir = filepath.split('/')[:-1]
         file_dir = functools.reduce(lambda str, dir: str + dir + '/', file_dir, '/')[:-1]
         return file_dir
@@ -49,6 +59,7 @@ class Environment:
     def get_file_name_extension(self, filepath):
         """Gets both the name of the file and its extention in a tuple for the file specified in the filepath
          argument"""
+        # TODO: This should just be replaced across the codebase with os.path.splitext
         file = filepath.split('/')[-1]
         file_name, file_extension = os.path.splitext(file)
         return [file_name, file_extension]

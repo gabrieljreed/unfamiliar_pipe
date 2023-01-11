@@ -4,6 +4,11 @@ import nuke
 import traceback
 import sys
 
+
+nuke.knobDefault("Root.colorManagement", "OCIO")
+nuke.knobDefault("Root.OCIO_config", "custom")
+nuke.knobDefault("Root.customOCIOConfigPath", "/opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio")
+
 try:
     print("""
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠴⠤⠤⠴⠄⡄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

@@ -340,3 +340,107 @@ def save(text):
     '''Prompts the user to save'''
     '''returns True if save is selected, False if don't save is selected otherwise None'''
     return binary_option(text, 'Save', 'Don\'t Save', title='Save Changes')
+
+
+class ShotSelectDialog(QtWidgets.QDialog):
+    """A dialog that allows the user to select a shot. The selected shot can be
+    accessed with the selectedShot() method"""
+
+    def __init__(self):
+        super(ShotSelectDialog, self).__init__()
+
+        self.env = env()
+        self.baseDir = os.path.abspath(os.path.join(self.env.project_dir, os.pardir, "Editing", "Animation"))
+
+        self.sequences = self.getSequences()
+        self.shots = []
+
+        self.setupUI()
+
+    def setupUI(self):
+        self.setWindowTitle("Choose a shot")
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setFixedSize(325, 200)
+
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.mainLayout = self.layout()
+
+        # LISTS
+        self.listLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.addLayout(self.listLayout)
+
+        self.sequenceLayout = QtWidgets.QVBoxLayout()
+        self.listLayout.addLayout(self.sequenceLayout)
+
+        self.sequenceLabel = QtWidgets.QLabel("Sequences")
+        self.sequenceLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.sequenceLayout.addWidget(self.sequenceLabel)
+
+        self.sequenceListWidget = QtWidgets.QListWidget()
+        self.sequenceListWidget.setFixedWidth(150)
+        self.sequenceListWidget.addItems(self.sequences)
+        self.sequenceLayout.addWidget(self.sequenceListWidget)
+
+        self.shotLayout = QtWidgets.QVBoxLayout()
+        self.listLayout.addLayout(self.shotLayout)
+
+        self.shotLabel = QtWidgets.QLabel("Shots")
+        self.shotLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.shotLayout.addWidget(self.shotLabel)
+
+        self.shotListWidget = QtWidgets.QListWidget()
+        self.shotListWidget.setFixedWidth(150)
+        self.shotListWidget.addItems(self.shots)
+        self.shotLayout.addWidget(self.shotListWidget)
+
+        self.sequenceListWidget.itemClicked.connect(self.updateUI)
+
+        # BUTTONS
+        self.buttonLayout = QtWidgets.QHBoxLayout()
+        self.mainLayout.addLayout(self.buttonLayout)
+
+        self.exportButton = QtWidgets.QPushButton("OK")
+        self.exportButton.clicked.connect(self.close)
+        self.exportButton.clicked.connect(self.accept)
+        self.buttonLayout.addWidget(self.exportButton)
+
+        self.cancelButton = QtWidgets.QPushButton("Cancel")
+        self.buttonLayout.addWidget(self.cancelButton)
+
+        self.cancelButton.clicked.connect(self.close)
+        self.cancelButton.clicked.connect(self.reject)
+
+    def updateUI(self):
+        self.shotListWidget.clear()
+        self.shotListWidget.addItems(self.getShots())
+
+    def getSequences(self):
+        """Returns an alphabetically sorted list of sequences in the project.
+        @return: list of sequences"""
+
+        sequences = [d for d in os.listdir(self.baseDir) if d.startswith(("SEQ"))]
+        sequences.sort()
+        return sequences
+
+    def getShots(self):
+        """Returns a list of shots in the current sequence. Returns an empty list if no sequence is selected.
+        @return: list of shots"""
+
+        if self.sequenceListWidget.currentItem() is None:
+            return []
+
+        currentSequence = self.sequenceListWidget.currentItem().text()[-1]
+        # shots = os.listdir(os.path.join(self.baseDir, currentSequence))
+        shots = os.listdir(self.env.get_shot_dir())
+        shots = [shot for shot in shots if shot.startswith(currentSequence)]
+        shots.sort()
+        return shots
+
+    def selectedShot(self):
+        """Returns the currently selected shot, or None if no shot is selected."""
+
+        if self.shotListWidget.currentItem() is None:
+            return None
+
+        currentShot = self.shotListWidget.currentItem().text()
+        return currentShot
