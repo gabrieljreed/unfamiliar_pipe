@@ -3,6 +3,10 @@
 import nuke
 import traceback
 import sys
+import os
+
+
+nuke.pluginAddPath(os.path.join(os.path.dirname(__file__), "gizmos"))
 
 
 nuke.knobDefault("Root.colorManagement", "OCIO")

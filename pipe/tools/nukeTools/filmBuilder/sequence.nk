@@ -1,0 +1,68 @@
+#! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov" format:"2048 1556 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 100" fps:"0" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+version 13.2 v2
+Root {
+ inputs 0
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath /opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_040
+ name Read4
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_030
+ name Read3
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_020
+ name Read2
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/03_fx_playblast/A_010
+ name Read1
+}
+AppendClip {
+ inputs 4
+ meta_from_first false
+ time ""
+ name AppendClip1
+}
+Write {
+ file /groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov
+ colorspace color_picking
+ file_type mov
+ mov64_codec appr
+ mov_prores_codec_profile "ProRes 4:4:4:4 XQ 12-bit"
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 20000
+ mov64_bitrate_tolerance 4000000
+ mov64_quality_min 1
+ mov64_quality_max 3
+ create_directories true
+ checkHashOnRead false
+ name Write1
+ selected true
+}

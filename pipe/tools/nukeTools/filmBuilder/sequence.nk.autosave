@@ -1,0 +1,92 @@
+#! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
+#write_info Write1 file:"" format:"2048 1556 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 100" fps:"0" colorspace:"default" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+version 13.2 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="1919" h="1015" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1256" stretch="1"/>
+            <splitter orientation="2">
+                <split size="571"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="401"/>
+                <dock id="" activePageId="DAG.1">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /groups/unfamiliar/anim_pipeline/pipe/tools/nukeTools/filmBuilder/sequence.nk
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath /opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_040
+ name Read4
+ xpos 730
+ ypos 9
+}
+Write {
+ name Write1
+ xpos 874
+ ypos 92
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_030
+ name Read3
+ xpos 620
+ ypos 90
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_020
+ name Read2
+ xpos 510
+ ypos 90
+}
+Read {
+ inputs 0
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/03_fx_playblast/A_010
+ name Read1
+ xpos 400
+ ypos 90
+}
+AppendClip {
+ inputs 4
+ meta_from_first false
+ time ""
+ name AppendClip1
+ xpos 730
+ ypos 119
+}
