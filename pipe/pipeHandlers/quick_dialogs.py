@@ -365,6 +365,11 @@ class ShotSelectDialog(QtWidgets.QDialog):
         self.setLayout(QtWidgets.QVBoxLayout())
         self.mainLayout = self.layout()
 
+        self.searchBar = QtWidgets.QLineEdit()
+        self.searchBar.setPlaceholderText("Search")
+        self.searchBar.textChanged.connect(self.search)
+        self.mainLayout.addWidget(self.searchBar)
+
         # LISTS
         self.listLayout = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(self.listLayout)
@@ -414,6 +419,17 @@ class ShotSelectDialog(QtWidgets.QDialog):
         self.shotListWidget.clear()
         self.shotListWidget.addItems(self.getShots())
 
+    def search(self):
+        search = self.searchBar.text()
+        self.sequenceListWidget.clear()
+        self.shotListWidget.clear()
+        if search == "":
+            self.sequenceListWidget.addItems(self.sequences)
+            self.shotListWidget.addItems(self.shots)
+        else:
+            self.sequenceListWidget.addItems([s for s in self.sequences if search in s])
+            self.shotListWidget.addItems([s for s in self.getAllShots() if search in s])
+
     def getSequences(self):
         """Returns an alphabetically sorted list of sequences in the project.
         @return: list of sequences"""
@@ -433,6 +449,11 @@ class ShotSelectDialog(QtWidgets.QDialog):
         # shots = os.listdir(os.path.join(self.baseDir, currentSequence))
         shots = os.listdir(self.env.get_shot_dir())
         shots = [shot for shot in shots if shot.startswith(currentSequence)]
+        shots.sort()
+        return shots
+
+    def getAllShots(self):
+        shots = os.listdir(self.env.get_shot_dir())
         shots.sort()
         return shots
 
