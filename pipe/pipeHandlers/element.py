@@ -1,4 +1,5 @@
 from pipe.pipeHandlers.environment import Environment as env
+import pipe.pipeHandlers.permissions as permissions
 import json
 import os
 import functools
@@ -47,6 +48,7 @@ class Element:
         file = open(self.element_path, 'w')
         file.write(json_object)
         file.close()
+        permissions.set_permissions(self.element_path)
 
     def retrieve_element_file(self):
         """Checks if a .element file exists in the pipe. If it does, it opens it and inputs the data into the datadict.
