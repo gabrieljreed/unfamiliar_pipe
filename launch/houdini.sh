@@ -24,9 +24,12 @@ export HOUDINI_DESK_PATH=${HOUDINI_MENU_PATH}
 export HOUDINI_TOOLBAR_PATH=${HOUDINI_TOOLS}"/custom/toolbar;&"
 export HOUDINI_UI_ICON_PATH=${MEDIA_PROJECT_DIR}"/icons;&"
 
+
 #Add path to hda assets
 export HOUDINI_OTLSCAN_PATH=${HOUDINI_TOOLS}"/custom/hda;&"
 
+#File amount limit 
+ulimit -n 4096
 #Start Houdini
 echo "Starting Houdini..."
 houdinifx -foreground -desktop UnSolaris $@ &

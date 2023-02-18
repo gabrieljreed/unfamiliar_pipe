@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=Denoiser
+Name[en_US]=Denoiser
+Comment=Denoiser
+Exec=/groups/unfamiliar/anim_pipeline/launch/denoiser.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/unwelleth.png
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Denoiser

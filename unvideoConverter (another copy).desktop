@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=witchs_cataya
+Name[en_US]=unvideoConverter
+Comment=BYU_anm_pipe shortcut for Maya
+Exec=/groups/unfamiliar/anim_pipeline/launch/videoConverter.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/playblast.svg
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Shortcut for the Unfamiliar build of video converter

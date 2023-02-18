@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=renderLock
+Name[en_US]=renderLock
+Comment=lock shots for render
+Exec=/groups/unfamiliar/anim_pipeline/launch/renderLock.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/skull.png
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Lock shots for render

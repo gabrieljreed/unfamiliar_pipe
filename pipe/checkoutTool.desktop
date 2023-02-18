@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=witchs_cataya
+Name[en_US]=checkoutTool
+Comment=BYU_anm_pipe shortcut for Maya
+Exec=/groups/unfamiliar/anim_pipeline/launch/checkout.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/amoogus.png
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Shortcut for the Unfamiliar build of video converter

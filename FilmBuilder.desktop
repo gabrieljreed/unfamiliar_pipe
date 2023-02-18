@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=FilmBuilder
+Name[en_US]=FilmBuilder
+Comment=Press this button to build a film
+Exec=/groups/unfamiliar/anim_pipeline/launch/filmBuilder.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/big_red_button.png
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Press this button to build a film

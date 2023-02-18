@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=imageSequenceToMov
+Name[en_US]=imageSequenceToMov
+Comment=Image Sequence to .mov converter
+Exec=/groups/unfamiliar/anim_pipeline/launch/imageSequenceConverter.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/playblast.svg
+Terminal=true
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Shortcut for the Unfamiliar build of image sequence converter

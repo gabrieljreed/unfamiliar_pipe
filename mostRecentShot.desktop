@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Name=witchs_cataya
+Name[en_US]=Get Most Recent Shot
+Comment=BYU_anm_pipe shortcut for Maya
+Exec=/groups/unfamiliar/anim_pipeline/launch/mostRecentShot.sh
+Icon=/groups/unfamiliar/anim_pipeline/icons/frog_open.png
+Terminal=false
+Type=Application
+Categories=Utility;Application;
+Comment[en_US.UTF-8]=Shortcut for the Unfamiliar build of Houdini

@@ -1,1 +1,1 @@
-__all__ = ['houdiniTools', 'mayaTools']
+__all__ = ['houdiniTools', 'mayaTools', 'nukeTools', 'pythonTools', 'standaloneTools', 'checkoutList']
