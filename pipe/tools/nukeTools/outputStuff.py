@@ -58,7 +58,7 @@ def sequenceShotDialog() -> str:
 def exrExport():
     """Creates a write node preconfigured for EXR exporting"""
     currentShot = getCurrentShot()
-    file = os.path.join(env.Environment().project_dir, "production", "edit", "shots", currentShot, "exr_sequences",
+    file = os.path.join(env.Environment().project_dir, "production", "edit", "shots", "exr_sequences", currentShot,
                         currentShot + ".###.exr")
     n = nuke.nodes.Write(file=file, file_type="exr", write_ACES_compliant_EXR=True, create_directories=True,
                          name="EXR Export")
@@ -69,7 +69,7 @@ def exrExport():
 def movExport():
     """Creates a write node preconfigured for MOV exporting"""
     currentShot = getCurrentShot()
-    file = os.path.join(env.Environment().project_dir, "production", "edit", "shots", currentShot, "temp_mov",
+    file = os.path.join(env.Environment().project_dir, "production", "edit", "shots", "05_temp_mp4", currentShot,
                         currentShot + ".mov")
     n = nuke.nodes.Write(file=file, file_type="mov", mov_prores_codec_profile="ProRes 4:4:4:4 XQ 12-bit",
                          colorspace="color_picking", create_directories=True, name="MOV Export")

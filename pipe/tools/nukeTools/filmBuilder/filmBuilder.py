@@ -22,6 +22,14 @@ SEQ_I = "I"
 
 sequences = [SEQ_A, SEQ_B, SEQ_C, SEQ_D, SEQ_E, SEQ_F, SEQ_G, SEQ_H, SEQ_I]
 
+PREVIS = "01_previs"
+ANIM_PLAYBLAST = "02_anim_playblast"
+FX_PLAYBLAST = "03_fx_playblast"
+LIGHTING_BEAUTY = "04_lighting_beauty"
+TEMP_MP4 = "05_temp_mp4"
+
+allVersionDirs = [PREVIS, ANIM_PLAYBLAST, FX_PLAYBLAST, LIGHTING_BEAUTY, TEMP_MP4]
+
 
 def buildFilm():
     """Builds the film"""
@@ -46,7 +54,8 @@ export NUKE_PATH=${MEDIA_PROJECT_DIR}/pipe:${MEDIA_PROJECT_DIR}/pipe/tools/nukeT
 
     pythonFile = os.path.normpath(os.path.join(os.path.dirname(__file__), "assemble.py"))
 
-    lastLine = f"/opt/Nuke13.2v2/Nuke13.2 -t {pythonFile} {editSequencesDir} {sequenceString}"
+    output = os.path.join(editSequencesDir, "film.mov")
+    lastLine = f"/opt/Nuke13.2v2/Nuke13.2 -t {pythonFile} {output} {sequenceString}"
     command += "\n" + lastLine
 
     print(command)
@@ -91,20 +100,25 @@ export NUKE_PATH=${MEDIA_PROJECT_DIR}/pipe:${MEDIA_PROJECT_DIR}/pipe/tools/nukeT
 
 def getMostRecentShotVersion(shotName, includeTempMp4=False):
     """Returns the most recent version of the shot specified by shotName"""
-    versionsDirs = os.listdir(editShotsDir)
-    versionsDirs.sort()
 
-    if includeTempMp4:
-        versionsDirs = versionsDirs[0:5]
-    else:
-        versionsDirs = versionsDirs[0:4]
+    # versionsDirs = os.listdir(editShotsDir)
+    # versionsDirs.sort()
+
+    # if includeTempMp4:
+    #     versionsDirs = versionsDirs[0:5]
+    # else:
+    #     versionsDirs = versionsDirs[0:4]
+
+    versionsDirs = ["02_anim_playblast", "03_fx_playblast", "04_lighting_beauty", "05_temp_mp4"]
+    if not includeTempMp4:
+        versionsDirs = versionsDirs[0:3]
 
     mostRecentTime = os.path.getmtime(os.path.join(editShotsDir, versionsDirs[0], shotName))
     mostRecentVersion = versionsDirs[0]
 
     for versionDir in versionsDirs:
         # Uncomment this when we're actually ready to go
-        # if len(os.listdir(os.path.join(editShotsDir, versionDir, shotName)) == 0:
+        # if len(os.listdir(os.path.join(editShotsDir, versionDir, shotName))) == 0:
         #     continue
 
         shotDir = os.path.join(editShotsDir, versionDir, shotName)
@@ -116,6 +130,37 @@ def getMostRecentShotVersion(shotName, includeTempMp4=False):
     return mostRecentVersion
 
 
+def _checkShots(versionDir, checkMissing=True):
+    """Utility function to check for missing shots"""
+    versionDir = os.path.join(editShotsDir, versionDir)
+    shots = os.listdir(versionDir)
+    shots.sort()
+    if checkMissing:
+        missingShots = 0
+        for shot in shots:
+            if not os.path.isdir(os.path.join(versionDir, shot)):
+                continue
+
+            if len(os.listdir(os.path.join(versionDir, shot))) == 0:
+                print(f"Missing shot: {shot}")
+                missingShots += 1
+
+        print(f"Missing {missingShots}/{len(shots)} shots")
+
+    else:
+        foundShots = 0
+        for shot in shots:
+            if not os.path.isdir(os.path.join(versionDir, shot)):
+                continue
+
+            if len(os.listdir(os.path.join(versionDir, shot))) != 0:
+                print(f"Shot {shot} has files")
+                foundShots += 1
+
+        print(f"Found {foundShots}/{len(shots)} shots")
+
+
 if __name__ == "__main__":
     # print(getMostRecentShotVersion("A_010"))
-    buildSequence(SEQ_A)
+    # buildSequence(SEQ_A)
+    _checkShots(FX_PLAYBLAST, checkMissing=False)

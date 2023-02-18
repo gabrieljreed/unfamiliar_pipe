@@ -1,0 +1,153 @@
+#! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov" format:"1998 1080 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 77" fps:"24" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" timecode:"00:00:03:16" colorManagement:"OCIO"
+version 13.2 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="2495" h="1339" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1832" stretch="1"/>
+            <splitter orientation="2">
+                <split size="761"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="535"/>
+                <dock id="" activePageId="DAG.1">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1" focus="true">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /groups/unfamiliar/anim_pipeline/pipe/tools/nukeTools/filmBuilder/SEQ_A.nk
+ frame 89
+ last_frame 77
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath /opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_040/A_040.mov
+ last 77
+ origlast 77
+ origset true
+ colorspace color_picking
+ name Read4
+ xpos 1060
+ ypos -45
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_030/A_030.mov
+ last 38
+ origlast 38
+ origset true
+ colorspace color_picking
+ name Read3
+ xpos 950
+ ypos 16
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_020/A_020.mov
+ last 45
+ origlast 45
+ origset true
+ colorspace color_picking
+ name Read2
+ xpos 840
+ ypos 16
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_010/A_010.mov
+ last 152
+ origlast 152
+ origset true
+ colorspace color_picking
+ name Read1
+ xpos 730
+ ypos 16
+}
+AppendClip {
+ inputs 4
+ meta_from_first false
+ time ""
+ name AppendClip1
+ xpos 1060
+ ypos 51
+}
+Write {
+ file /groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov
+ colorspace color_picking
+ file_type mov
+ mov64_codec appr
+ mov_prores_codec_profile "ProRes 4:4:4:4 XQ 12-bit"
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 20000
+ mov64_bitrate_tolerance 4000000
+ mov64_quality_min 1
+ mov64_quality_max 3
+ create_directories true
+ checkHashOnRead false
+ name Write1
+ xpos 1060
+ ypos 77
+}
+Viewer {
+ frame 89
+ frame_range 1-77
+ viewerProcess "sRGB (ACES)"
+ name Viewer1
+ xpos 1060
+ ypos 127
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov
+ format "1998 1080 0 0 1998 1080 1 "
+ last 77
+ origlast 77
+ origset true
+ colorspace color_picking
+ name Read5
+ xpos 164
+ ypos -70
+}

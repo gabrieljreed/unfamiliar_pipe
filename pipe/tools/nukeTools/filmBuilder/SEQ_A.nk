@@ -1,8 +1,9 @@
 #! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
-#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov" format:"2048 1556 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 100" fps:"0" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_A.mov" format:"1998 1080 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 312" fps:"24" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" timecode:"00:00:00:00" colorManagement:"OCIO"
 version 13.2 v2
 Root {
  inputs 0
+ last_frame 312
  format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
  proxy_type scale
  proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
@@ -20,22 +21,42 @@ Root {
 }
 Read {
  inputs 0
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_040
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_040/A_040.mov
+ last 77
+ origlast 77
+ origset true
+ colorspace color_picking
  name Read4
 }
 Read {
  inputs 0
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_030
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_030/A_030.mov
+ last 38
+ origlast 38
+ origset true
+ colorspace color_picking
  name Read3
 }
 Read {
  inputs 0
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/A_020
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_020/A_020.mov
+ last 45
+ origlast 45
+ origset true
+ colorspace color_picking
  name Read2
 }
 Read {
  inputs 0
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/03_fx_playblast/A_010
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/A_010/A_010.mov
+ last 152
+ origlast 152
+ origset true
+ colorspace color_picking
  name Read1
 }
 AppendClip {

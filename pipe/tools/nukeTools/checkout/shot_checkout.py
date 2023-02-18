@@ -79,10 +79,10 @@ class ShotCheckout(QtWidgets.QMainWindow):
 
         element = Element(nukeFilePath)
 
-        if element.is_assigned():
-            if element.get_assigned_user() != env().get_username():
-                nuke.message("Shot is checked out by: " + element.get_assigned_user())
-                return
+        # if element.is_assigned():
+        #     if element.get_assigned_user() != env().get_username():
+        #         nuke.message("Shot is checked out by: " + element.get_assigned_user())
+        #         return
 
         element.assign_user(env().get_username())
         element.write_element_file()
