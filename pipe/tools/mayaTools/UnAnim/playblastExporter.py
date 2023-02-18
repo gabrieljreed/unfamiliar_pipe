@@ -17,11 +17,12 @@ class PlayblastExporter(QtWidgets.QMainWindow):
         self.videoScalePct = 100
         self.videoCompression = "Animation"
         self.videoOutputType = "qt"
-        self.width = 1920
+        self.width = 1998
         self.height = 1080
 
         self.env = env.Environment()
-        self.baseDir = os.path.abspath(os.path.join(self.env.project_dir, os.pardir, "Editing", "Animation"))
+        self.baseDir = os.path.abspath(os.path.join(self.env.project_dir, os.pardir, "anim_pipeline", "production",
+                                                    "edit", "shots", "02_anim_playblast"))
         print(self.baseDir)
 
         self.sequences = self.getSequences()
@@ -32,7 +33,7 @@ class PlayblastExporter(QtWidgets.QMainWindow):
     def setupUI(self):
         self.setWindowTitle("Playblast Exporter")
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setFixedSize(325, 200)
+        self.resize(325, 200)
 
         self.mainWidget = QtWidgets.QWidget()
         self.mainLayout = QtWidgets.QVBoxLayout(self.mainWidget)
@@ -68,6 +69,16 @@ class PlayblastExporter(QtWidgets.QMainWindow):
 
         self.sequenceListWidget.itemClicked.connect(self.updateUI)
 
+        currentSceneName = os.path.basename(mc.file(q=True, sn=True))
+        if currentSceneName != "":
+            currentShot = stringUtilities.stripSuffix(currentSceneName, "_main.mb")
+            currentSequence = f"SEQ_{currentSceneName[0]}"
+            if currentSequence in self.getSequences():
+                self.sequenceListWidget.setCurrentRow(self.getSequences().index(currentSequence))
+                self.updateUI()
+                if currentShot in self.getShots():
+                    self.shotListWidget.setCurrentRow(self.getShots().index(currentShot))
+
         # BUTTONS
         self.buttonLayout = QtWidgets.QHBoxLayout()
         self.mainLayout.addLayout(self.buttonLayout)
@@ -89,7 +100,7 @@ class PlayblastExporter(QtWidgets.QMainWindow):
         """Returns an alphabetically sorted list of sequences in the project.
         @return: list of sequences"""
 
-        sequences = [d for d in os.listdir(self.baseDir) if d.startswith(("SEQ"))]
+        sequences = list({f"SEQ_{d[0]}" for d in os.listdir(self.baseDir)})
         sequences.sort()
         return sequences
 
@@ -116,13 +127,14 @@ class PlayblastExporter(QtWidgets.QMainWindow):
             return
 
         currentSequence = self.sequenceListWidget.currentItem().text()
-        currentShot = f"{self.shotListWidget.currentItem().text()}_main"
+        currentShot = f"{self.shotListWidget.currentItem().text()}"
 
-        fileName = os.path.join(self.baseDir, currentSequence, currentShot)
+        fileName = os.path.join(self.baseDir, currentShot, currentShot)
 
         try:
             mc.playblast(f=fileName, forceOverwrite=True, viewer=False, percent=self.videoScalePct,
-                         format=self.videoFormat, compression=self.videoCompression, widthHeight = [self.width, self.height])
+                         format=self.videoFormat, compression=self.videoCompression,
+                         widthHeight=[self.width, self.height])
 
             # Set permissions
             permissions.set_permissions(f"{fileName}.mov")

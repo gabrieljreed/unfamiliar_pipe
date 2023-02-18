@@ -49,7 +49,7 @@ def start_debug_session():
     maya_location = os.path.join(os.environ['MAYA_LOCATION'], 'bin', 'mayapy')
     debugpy.configure({"python": maya_location})
 
-    # Start a debug session 
+    # Start a debug session
     debugpy.listen(5678)
     debugpy.wait_for_client()
 

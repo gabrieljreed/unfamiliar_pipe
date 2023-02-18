@@ -1,8 +1,8 @@
 from functools import partial
 import maya.cmds as cmds
 
-props = ['kelleth_doll', 'maggie_doll', 'singe_doll', 'wand', 'ring', 'ring_box', 'flower_vase', 'frog', 'kelleth_doll_head']
-parent_grp = ['kelleth_doll_main:kelleth_doll_main_CTRL_GRP','maggie_doll_main:maggie_doll_main_CTRL_GRP', 'singe_doll_main:singe_main_CTRL_GRP', 'wand_main:wand_global_ctrl_grp_01', '4', '5', '6','7', 'kelleth_doll_main:head_broken_const_grp']
+props = ['kelleth_doll', 'maggie_doll', 'singe_doll', 'wand', 'ring', 'ring_box', 'bouquet', 'frog', 'kelleth_doll_head']
+parent_grp = ['kelleth_doll_main:kelleth_doll_main_CTRL_GRP','maggie_doll_main:maggie_doll_main_CTRL_GRP', 'singe_doll_main:singe_main_CTRL_GRP', 'wand_main:wand_global_ctrl_grp_01', 'ring_n_box_main:ring_ctrl_01_cons', 'ring_n_box_main:ring_box_ctrl_01_cons', 'bouquet_main:bouquet_main_ctrl_grp','7', 'kelleth_doll_main:head_broken_const_grp']
 active_parent = parent_grp[0]
 active_const = 'Parent'
 offset = False
@@ -32,7 +32,7 @@ def setProp(item):
         active_parent = parent_grp[4]
     elif item == 'Ring Box':
         active_parent = parent_grp[5]
-    elif item == 'Flower Vase':
+    elif item == 'Bouquet':
         active_parent = parent_grp[6]
     elif item == 'Frog':
         active_parent = parent_grp[7]
@@ -76,8 +76,8 @@ class PropConstUI(object):
       cmds.menuItem(label = 'Wand')
       cmds.menuItem(label = 'Ring')
       cmds.menuItem(label = 'Ring Box')
-      cmds.menuItem(label = 'Flower Vase')
-      cmds.menuItem(label = 'Frog')
+      cmds.menuItem(label = 'Bouquet')
+      cmds.menuItem(label = 'Frog - incomplete')
       
       cmds.optionMenu(label='Constraint Type', changeCommand=setConst)
       cmds.menuItem(label ='Parent')

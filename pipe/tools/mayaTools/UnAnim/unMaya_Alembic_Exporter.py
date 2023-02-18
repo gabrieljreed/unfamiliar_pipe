@@ -196,6 +196,7 @@ class UnMaya_Alembic_Exporter():
         self.el = umEl.UnMaya_Element(self.alem_filepath)
         self.version_alembic(command)
         self.comment_gui()
+        permissions.set_permissions(anim_filepath)
     
     #Checks if a dir exists, returns True or False 
     def dir_exists(self, dir_path):
@@ -246,6 +247,8 @@ class UnMaya_Alembic_Exporter():
         # Set permissions
         permissions.set_permissions(self.el.filepath)
         permissions.set_permissions(new_file_path)
+        # Better safe than sorry
+        permissions.set_permissions(os.path.dirname(new_file_path))
     
     #updates the element file with the comment
     def update_element_file(self):

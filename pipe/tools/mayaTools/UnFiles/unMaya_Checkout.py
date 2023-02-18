@@ -51,34 +51,21 @@ class ShotCheckout:
 
     def checkout_gui(self):
         """GUI: displays a list of shots to select from"""
-        if cmds.window("ms_checkout_GUI", exists=True):
-            cmds.deleteUI("ms_checkout_GUI")
 
-        win = cmds.window("ms_checkout_GUI", title="CHECKOUT SHOT") 
-        cmds.showWindow(win)
-        cmds.columnLayout()
+        import pipe.pipeHandlers.quick_dialogs as qd
 
-        cmds.rowLayout(nc=3)
-        self.prefix = cmds.textFieldGrp('search_field')
-        cmds.button(label="Search", c=lambda x: self.search())
-        cmds.button(label="X", c=lambda x: self.base_list())
-        cmds.setParent('..')
+        dialog = qd.ShotSelectDialog()
 
-        selection = cmds.textScrollList("Shot_List", numberOfRows=8,
-                                        append=self.shot_list,
-                                        selectIndexedItem=1, showIndexedItem=1)
-
-        cmds.rowLayout(numberOfColumns=1)
-        cmds.button(label="Checkout Shot", c=lambda x: self.open_file(self.getSelected(selection)))
-        cmds.setParent("..")
+        if dialog.exec_():
+            self.open_file(dialog.selectedShot())
 
     def open_file(self, selected_shot):
         """Opens the shot selected in the GUI"""
-
         try:
-            print("Selected shot: ", selected_shot[0])
+            print("Selected shot: ", selected_shot)
             # Get the .mb directory
-            mb_dir = self.curr_env.get_mb_dir(selected_shot[0])
+            mb_dir = self.curr_env.get_mb_dir(selected_shot)
+            print(f"mb_dir: {mb_dir}")
             # Access the respective .element file
             el = umEl.UnMaya_Element(mb_dir)
             # Check if the .mb file is already assigned

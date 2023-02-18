@@ -141,18 +141,21 @@ class Camera_Exporter:
     def get_auto_frameRange(self):
                 
         sequence = cmds.listConnections("sequencer1", type="shot")
-        for curr_shot in sequence:
-            shot_name = cmds.shot(curr_shot, q=True, shotName=True)
-            if shot_name in self.shot_selection:
-                self.cam_shot = curr_shot
-                break
-            else:
-                self.cam_shot = None
+        if sequence != None:
+            for curr_shot in sequence:
+                shot_name = cmds.shot(curr_shot, q=True, shotName=True)
+                if shot_name in self.shot_selection:
+                    self.cam_shot = curr_shot
+                    break
+                else:
+                    self.cam_shot = None
                 
-        if self.cam_shot != None:
-            self.shot_start = int(cmds.shot(self.cam_shot, q=True, startTime=True))
-            self.shot_end = int(cmds.shot(self.cam_shot, q=True, endTime=True))
-            self.comment_gui()
+            if self.cam_shot != None:
+                self.shot_start = int(cmds.shot(self.cam_shot, q=True, startTime=True))
+                self.shot_end = int(cmds.shot(self.cam_shot, q=True, endTime=True))
+                self.comment_gui()
+            else:
+                self.get_frameRange_gui()
         else:
             self.get_frameRange_gui()
         

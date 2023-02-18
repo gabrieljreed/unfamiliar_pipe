@@ -149,6 +149,8 @@ signatures = [
     "picking Craig in the Craig vs Jaren fight",
     "picking Jaren in the Craig vs Jaren fight",
     "perchance",
+    "It's the wrong trousers, Gromit!",
+    "Cracking toast Gromit!",
 ]
 
 
@@ -1873,6 +1875,9 @@ def capture_playblast_animation(video_file, scale_pct, compression, video_format
 
     playblast = cmds.playblast(p=100, f=video_file, compression=compression, format=video_format,
                                forceOverwrite=True, v=False)
+    
+    print(f"Playblast file: {playblast}")
+    print(f"Playblast size: {os.path.getsize(playblast)}")
 
     outputFile = playblast.replace(".mov", ".mp4")
     # Erase the output file if it already exists
@@ -1881,10 +1886,15 @@ def capture_playblast_animation(video_file, scale_pct, compression, video_format
         print("File exists, removing...")
 
     try:
-        result = subprocess.run(["ffmpeg", "-i", playblast, "-vcodec", "h264", "-acodec", "mp2", outputFile])
-        print("stdout: {}".format(result.stdout))
-        print("stderr: {}".format(result.stderr))
-        print("returncode: {}".format(result.returncode))
+        result = subprocess.run(["ffmpeg", "-i", playblast, "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset",
+                                 "superfast", "-crf", "20", "-c:a", "aac", "-b:a", "128k", outputFile])
+        if os.path.getsize(outputFile) == 0:
+            print("File size is 0, trying again...")
+            try:
+                os.remove(outputFile)
+            except OSError:
+                print(f"Unable to delete file")
+            result = subprocess.run(["ffmpeg", "-i", playblast, "-vcodec", "h264", "-acodec", "mp2", outputFile])
 
     except Exception as e:
         print(e)
