@@ -1,7 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "name": "RenderBoy",
+            "type": "python",
+            "request": "launch",
+            "program": "/groups/unfamiliar/anim_pipeline/pipe/tools/standaloneTools/RenderBoy/renderboy/__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
         {
             "name": "Maya Python: Remote Attach",
             "type": "python",
