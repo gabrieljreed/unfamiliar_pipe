@@ -1,3 +1,6 @@
+"""Assemble a sequence of frames or videos into a single video file."""
+
+
 import os
 import sys
 import nuke
@@ -5,6 +8,7 @@ import subprocess
 
 
 def countFrames(path):
+    """Count the number of frames in a video file."""
     s = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries",
                         "stream=nb_read_frames", "-print_format", "csv", path], stdout=subprocess.PIPE)
     result = int(s.stdout.decode().split(",")[1])
@@ -19,8 +23,26 @@ for i, arg in enumerate(sys.argv[2:]):
     if arg.endswith("assemble.py"):
         continue
     filePath = os.listdir(arg)
+
+    if len(filePath) == 0:
+        print(f"Warning: {arg} is empty. Skipping...")
+        continue
+
+    print(f"found {len(filePath)} files in {arg}")
+
+    # Get the most recently modified file
+    mostRecentTime = os.path.getmtime(os.path.join(arg, filePath[0]))
     finalFilePath = os.path.join(arg, filePath[0])
+
+    for file in filePath:
+        if os.path.getmtime(os.path.join(arg, file)) > mostRecentTime:
+            finalFilePath = os.path.join(arg, file)
+            mostRecentTime = os.path.getmtime(os.path.join(arg, file))
+
+    # finalFilePath = os.path.join(arg, filePath[0])
+
     print(finalFilePath)
+
     r = nuke.createNode("Read")
     r["file"].setValue(finalFilePath)
     r["colorspace"].setValue("color_picking")
@@ -51,6 +73,13 @@ nuke.root()["last_frame"].setValue(totalFrames)
 nuke.scriptSave(os.path.dirname(__file__) + f"/{currentSequence}.nk")
 print(f"Saved script to {os.path.dirname(__file__)}")
 print(f"Total frames: {totalFrames}")
-print("Executing...")
-nuke.execute(w, 1, totalFrames)
+print(f"Executing...")
+
+try:
+    nuke.execute(w, 1, totalFrames)
+except Exception as e:
+    print(f"Failed to execute {currentSequence}")
+    print(e)
+    exit()
+
 print(f"Done executing {currentSequence}")

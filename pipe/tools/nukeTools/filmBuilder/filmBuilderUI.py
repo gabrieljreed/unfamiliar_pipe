@@ -15,7 +15,7 @@ class FilmBuilderUI(QtWidgets.QWidget):
 
     def buildUI(self):
         self.mainLayout = QtWidgets.QVBoxLayout(self)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        # self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.setSpacing(0)
 
         self.setLayout(self.mainLayout)
@@ -34,7 +34,12 @@ class FilmBuilderUI(QtWidgets.QWidget):
         self.mainLayout.addWidget(filmButton)
         self.radioButtons.append(filmButton)
 
+        spacerWidget = QtWidgets.QWidget()
+        spacerWidget.setFixedHeight(50)
+        self.mainLayout.addWidget(spacerWidget)
+
         self.buildButton = QtWidgets.QPushButton("Build")
+        self.buildButton.setMinimumHeight(50)
         self.buildButton.clicked.connect(self.buildFilm)
         self.mainLayout.addWidget(self.buildButton)
 

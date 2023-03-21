@@ -1,0 +1,190 @@
+#! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_B.mov" format:"1280 692 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 1344" fps:"24" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" timecode:"00:00:00:00" colorManagement:"OCIO"
+version 13.2 v2
+Root {
+ inputs 0
+ last_frame 1344
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath /opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_140/B_140_V001.mov
+ last 234
+ origlast 234
+ origset true
+ colorspace color_picking
+ name Read14
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_130/B_130_V001.mov
+ last 190
+ origlast 190
+ origset true
+ colorspace color_picking
+ name Read13
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_120/B_120_V001.mov
+ last 110
+ origlast 110
+ origset true
+ colorspace color_picking
+ name Read12
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_110/B_110_V001.mov
+ last 50
+ origlast 50
+ origset true
+ colorspace color_picking
+ name Read11
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_100/B_100_V001.mov
+ last 39
+ origlast 39
+ origset true
+ colorspace color_picking
+ name Read10
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/B_090/B090.mov
+ last 90
+ origlast 90
+ origset true
+ colorspace color_picking
+ name Read9
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_080/B_080_V001.mov
+ last 65
+ origlast 65
+ origset true
+ colorspace color_picking
+ name Read8
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_070/B_070_V001.mov
+ last 75
+ origlast 75
+ origset true
+ colorspace color_picking
+ name Read7
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_060/B_060_V001.mov
+ last 51
+ origlast 51
+ origset true
+ colorspace color_picking
+ name Read6
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_050/B_050_V001.mov
+ last 40
+ origlast 40
+ origset true
+ colorspace color_picking
+ name Read5
+}
+push 0
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/B_031/B_031_lighterBG.mov
+ last 67
+ origlast 67
+ origset true
+ colorspace color_picking
+ name Read4
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/B_020/B_020_V001.mov
+ last 60
+ origlast 60
+ origset true
+ colorspace color_picking
+ name Read3
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/B_015/B_015.mov
+ last 60
+ origlast 60
+ origset true
+ colorspace color_picking
+ name Read2
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/B_010/B_010_Beauty.mov
+ last 213
+ origlast 213
+ origset true
+ colorspace color_picking
+ name Read1
+}
+AppendClip {
+ inputs 15
+ meta_from_first false
+ time ""
+ name AppendClip1
+}
+Write {
+ file /groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_B.mov
+ colorspace color_picking
+ file_type mov
+ mov64_codec appr
+ mov_prores_codec_profile "ProRes 4:4:4:4 XQ 12-bit"
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 20000
+ mov64_bitrate_tolerance 4000000
+ mov64_quality_min 1
+ mov64_quality_max 3
+ create_directories true
+ checkHashOnRead false
+ name Write1
+ selected true
+}
