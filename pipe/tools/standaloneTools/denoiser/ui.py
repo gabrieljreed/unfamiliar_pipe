@@ -172,6 +172,22 @@ class DenoiserWidget(QtWidgets.QWidget):
         self.blendFactorLineEdit.setText(str(self.defaultBlendFactor))
         self.blendFactorLayout.addWidget(self.blendFactorLineEdit)
 
+        # RENDER TYPE
+        self.renderTypeLayout = QtWidgets.QHBoxLayout()
+        self.shotTabLayout.addLayout(self.renderTypeLayout)
+
+        self.renderTypeLabel = QtWidgets.QLabel("Render Type")
+        self.renderTypeLayout.addWidget(self.renderTypeLabel)
+
+        self.renderTypeComboBox = QtWidgets.QComboBox()
+        self.renderTypeComboBox.addItems(["Re-Denoise", "New Render"])
+        self.renderTypeLayout.addWidget(self.renderTypeComboBox)
+
+        self.renderTypeInfoButton = QtWidgets.QPushButton("i")
+        self.renderTypeInfoButton.setFixedWidth(20)
+        self.renderTypeInfoButton.clicked.connect(self.renderTypeInfo)
+        self.renderTypeLayout.addWidget(self.renderTypeInfoButton)
+
         # BUTTONS
         self.buttonLayout = QtWidgets.QHBoxLayout()
         self.shotTabLayout.addLayout(self.buttonLayout)
@@ -184,6 +200,10 @@ class DenoiserWidget(QtWidgets.QWidget):
         self.buttonLayout.addWidget(self.cancelButton)
 
         self.cancelButton.clicked.connect(self.close)
+
+    def renderTypeInfo(self):
+        """Show a message box with information about the render types."""
+        QtWidgets.QMessageBox.information(self, "Render Types", "Re-Denoise: Run a new denoise pass on the same rendered images.\n\nNew Render: A new render is ready to be denoised. (WARNING: This deletes the 'undenoised' folder!).")
 
     def setupFrameTab(self) -> None:
         """Set up the frame tab UI."""
@@ -309,6 +329,37 @@ class DenoiserWidget(QtWidgets.QWidget):
 
         blendFactor = self.blendFactorLineEdit.text()
 
+        if self.renderTypeComboBox.currentText() == "New Render":
+            foldersToDelete = []
+            totalFoldersToDelete = 0
+            totalFilesToDelete = 0
+            for item in checkedItems:
+                undenoisedFolderPath = os.path.join(self.env.get_shot_dir(), self.shotListWidget.currentItem().text(),
+                                                    "render", item, "undenoised")
+                if not os.path.isdir(undenoisedFolderPath):
+                    continue
+                foldersToDelete.append(undenoisedFolderPath)
+                totalFoldersToDelete += 1
+                totalFilesToDelete += len(os.listdir(undenoisedFolderPath))
+
+            if totalFoldersToDelete > 0:
+                reply = QtWidgets.QMessageBox.question(
+                    self,
+                    "Delete Undenoised Folders?",
+                    "Are you sure you want to delete {} undenoised folders and {} files?".format(
+                        totalFoldersToDelete, totalFilesToDelete
+                    ),
+                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                    QtWidgets.QMessageBox.No
+                )
+
+                if reply == QtWidgets.QMessageBox.No:
+                    return
+
+                for folder in foldersToDelete:
+                    shutil.rmtree(folder)
+                    print(f"Deleted {folder}")
+
         for item in checkedItems:
             itemPath = os.path.join(self.env.get_shot_dir(), self.shotListWidget.currentItem().text(), "render", item)
 
@@ -393,7 +444,7 @@ class DenoiserWidget(QtWidgets.QWidget):
                 if len(stdout) > 0:
                     print(stdout)
                 else:
-                    print("Denoising successful!")
+                    print(f"Denoising successful!\nDenoised frame located at {outPath}")
 
 
 if __name__ == '__main__':
