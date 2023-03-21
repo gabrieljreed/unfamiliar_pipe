@@ -1,4 +1,5 @@
 """
+Standalone denoiser tool. This tool is used to denoise renders from Houdini with idenoiser.
 
 idenoise -d oidn -n nn -a albedo --aovs Ci a Nn motionBack z albedo beauty
 directDiffuse directSpecular indirectDiffuse indirectSpecular subsurface
@@ -7,15 +8,25 @@ transmissiveGlassLobe shadow __depth  --options '{"blendfactor":0.75}'
 IN_FILE.exr
 OUT_FILE.exr
 """
+
 from PySide2 import QtWidgets, QtCore, QtGui
 
 import sys
 import os
+import shutil
 import subprocess
 import threading
 import json
 
 sys.path.append(r"/groups/unfamiliar/anim_pipeline")
+sys.path.append(r"/groups/unfamiliar/anim_pipeline/pipe/vendor")
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "tqdm"])
+    from tqdm import tqdm
+
 
 import pipe.pipeHandlers.environment as env
 import pipe.pipeHandlers.permissions as permissions
@@ -48,20 +59,37 @@ class DenoiserWidget(QtWidgets.QWidget):
         self.setupUI()
 
     def setupUI(self) -> None:
+        """Set up the UI."""
         self.setWindowTitle("Denoiser")
         self.setWindowIcon(QtGui.QIcon(':/icons/unwelleth.png'))
 
         self.mainLayout = QtWidgets.QVBoxLayout(self)
         self.mainLayout.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
 
+        self.tabWidget = QtWidgets.QTabWidget()
+        self.mainLayout.addWidget(self.tabWidget)
+
+        self.shotTab = QtWidgets.QWidget()
+        self.frameTab = QtWidgets.QWidget()
+
+        self.tabWidget.addTab(self.shotTab, "Denoise shots")
+        self.tabWidget.addTab(self.frameTab, "Denoise frames")
+
+        self.setupShotTab()
+        self.setupFrameTab()
+
+    def setupShotTab(self) -> None:
+        """Set up the shot tab UI."""
+        self.shotTabLayout = QtWidgets.QVBoxLayout(self.shotTab)
+
         self.searchBar = QtWidgets.QLineEdit()
         self.searchBar.setPlaceholderText("Search")
         self.searchBar.textChanged.connect(self.search)
-        self.mainLayout.addWidget(self.searchBar)
+        self.shotTabLayout.addWidget(self.searchBar)
 
         # LISTS
         self.listLayout = QtWidgets.QHBoxLayout()
-        self.mainLayout.addLayout(self.listLayout)
+        self.shotTabLayout.addLayout(self.listLayout)
 
         self.sequenceLayout = QtWidgets.QVBoxLayout()
         self.listLayout.addLayout(self.sequenceLayout)
@@ -111,6 +139,8 @@ class DenoiserWidget(QtWidgets.QWidget):
             currentShotNoUnderscores = currentShot.replace("_", "").lower()
 
             for item in itemsToAdd:
+                if not os.path.isdir(os.path.join(self.env.get_shot_dir(), self.shotListWidget.currentItem().text(), "render", item)):
+                    continue
                 if len(os.listdir(os.path.join(self.env.get_shot_dir(), self.shotListWidget.currentItem().text(), "render", item))) == 0:
                     continue
 
@@ -129,11 +159,11 @@ class DenoiserWidget(QtWidgets.QWidget):
 
         self.shotDirList = QtWidgets.QListWidget()
         self.shotDirList.setAlternatingRowColors(True)
-        self.mainLayout.addWidget(self.shotDirList)
+        self.shotTabLayout.addWidget(self.shotDirList)
 
         # BLEND FACTOR
         self.blendFactorLayout = QtWidgets.QHBoxLayout()
-        self.mainLayout.addLayout(self.blendFactorLayout)
+        self.shotTabLayout.addLayout(self.blendFactorLayout)
 
         self.blendFactorLabel = QtWidgets.QLabel("Blend Factor")
         self.blendFactorLayout.addWidget(self.blendFactorLabel)
@@ -144,7 +174,7 @@ class DenoiserWidget(QtWidgets.QWidget):
 
         # BUTTONS
         self.buttonLayout = QtWidgets.QHBoxLayout()
-        self.mainLayout.addLayout(self.buttonLayout)
+        self.shotTabLayout.addLayout(self.buttonLayout)
 
         self.exportButton = QtWidgets.QPushButton("OK")
         self.exportButton.clicked.connect(self.denoise)
@@ -155,7 +185,82 @@ class DenoiserWidget(QtWidgets.QWidget):
 
         self.cancelButton.clicked.connect(self.close)
 
+    def setupFrameTab(self) -> None:
+        """Set up the frame tab UI."""
+        self.frameTabLayout = QtWidgets.QVBoxLayout(self.frameTab)
+
+        self.renderFolder = "Render Folder"
+
+        def browseFolder():
+            self.renderFolder = QtWidgets.QFileDialog.getExistingDirectory()
+            self.updateFrameWidget()
+
+        self.browseFolderButton = QtWidgets.QPushButton("Browse")
+        self.browseFolderButton.clicked.connect(browseFolder)
+        self.frameTabLayout.addWidget(self.browseFolderButton)
+
+        self.frameWidget = QtWidgets.QListWidget()
+        self.frameTabLayout.addWidget(self.frameWidget)
+        self.frameWidget.setDisabled(True)
+
+        self.frameWidgetLayout = QtWidgets.QVBoxLayout(self.frameWidget)
+
+        self.renderFolderLabel = QtWidgets.QLabel(self.renderFolder)
+        self.frameWidgetLayout.addWidget(self.renderFolderLabel)
+
+        self.frameList = QtWidgets.QListWidget()
+        self.frameList.setAlternatingRowColors(True)
+        self.frameWidgetLayout.addWidget(self.frameList)
+
+        self.aovList = QtWidgets.QListWidget()
+        self.aovList.setAlternatingRowColors(True)
+        self.frameWidgetLayout.addWidget(self.aovList)
+
+        for aov in self.aovs.split(" "):
+            if aov == "" or aov == " ":
+                continue
+            listWidgetItem = QtWidgets.QListWidgetItem(aov)
+            listWidgetItem.setFlags(listWidgetItem.flags() | QtCore.Qt.ItemIsUserCheckable)
+            listWidgetItem.setCheckState(QtCore.Qt.Checked)
+            self.aovList.addItem(listWidgetItem)
+
+        # BLEND FACTOR
+        self.frameBlendFactorLayout = QtWidgets.QHBoxLayout()
+        self.frameWidgetLayout.addLayout(self.frameBlendFactorLayout)
+
+        self.blendFactorLabel = QtWidgets.QLabel("Blend Factor")
+        self.frameBlendFactorLayout.addWidget(self.blendFactorLabel)
+
+        self.blendFactorLineEdit = QtWidgets.QLineEdit()
+        self.blendFactorLineEdit.setText(str(self.defaultBlendFactor))
+        self.frameBlendFactorLayout.addWidget(self.blendFactorLineEdit)
+
+        self.denoiseFrameButton = QtWidgets.QPushButton("Denoise Frame(s)")
+        self.denoiseFrameButton.clicked.connect(self.denoiseFrame)
+        self.frameWidgetLayout.addWidget(self.denoiseFrameButton)
+
+    def updateFrameWidget(self):
+        """Update the frame widget when the user browses for a folder."""
+        self.frameWidget.setDisabled(False)
+
+        self.renderFolderLabel.setText(os.path.basename(self.renderFolder))
+        self.renderFolderLabel.setToolTip(self.renderFolder)
+
+        self.frameList.clear()
+        frames = os.listdir(self.renderFolder)
+        frames.sort()
+
+        for frame in frames:
+            if os.path.isdir(os.path.join(self.renderFolder, frame)):
+                continue
+
+            listWidgetItem = QtWidgets.QListWidgetItem(frame)
+            listWidgetItem.setFlags(listWidgetItem.flags() | QtCore.Qt.ItemIsUserCheckable)
+            listWidgetItem.setCheckState(QtCore.Qt.Unchecked)
+            self.frameList.addItem(listWidgetItem)
+
     def updateUI(self):
+        """Update the UI when a sequence is clicked on."""
         self.shotListWidget.clear()
         self.shotListWidget.addItems(self.getShots())
 
@@ -211,39 +316,91 @@ class DenoiserWidget(QtWidgets.QWidget):
                 images = os.listdir(folderPath)
                 images.sort()
 
-                if "denoised" in images:
-                    images.remove("denoised")
+                if not os.path.exists(os.path.join(folderPath, "undenoised")):
+                    os.makedirs(os.path.join(folderPath, "undenoised"))
 
-                if os.path.exists(os.path.join(folderPath, "denoised")):
-                    for f in os.listdir(os.path.join(folderPath, "denoised")):
-                        os.remove(os.path.join(folderPath, "denoised", f))
-                else:
-                    os.makedirs(os.path.join(folderPath, "denoised"))
+                    for f in images:
+                        if not os.path.isfile(os.path.join(folderPath, f)):
+                            continue
 
-                for i, img in enumerate(images):
+                        shutil.move(os.path.join(folderPath, f), os.path.join(folderPath, "undenoised", f))
+
+                images = os.listdir(os.path.join(folderPath, "undenoised"))
+
+                errors = []
+
+                # for i, img in enumerate(images):
+                for img in tqdm(images, desc=os.path.basename(folderPath)):
                     blendFactorCommand = '\'{"blendfactor":' + str(blendFactor) + '}\''
 
-                    inPath = os.path.join(folderPath, img)
-                    outPath = os.path.join(folderPath, "denoised", "denoised_" + img)
+                    inPath = os.path.join(folderPath, "undenoised", img)
+                    outPath = os.path.abspath(os.path.join(folderPath, img))
                     # command = f"idenoise -d oidn -n nn -a albedo --aovs {self.aovs} --options {blendFactorCommand} {inPath} {outPath}"
-                    command = f"idenoise {inPath} {outPath} -d oidn -n nn -a albedo --options {blendFactorCommand} --aovs C Cf Color Ci a Nn motionBack z albedo beauty directDiffuse directSpecular indirectDiffuse indirectSpecular subsurface directSpecularGlassLobe indirectSpecularGlassLobe subsurfaceLobe transmissiveGlassLobe shadow __depth"
+                    command = f"idenoise {inPath} {outPath} -d oidn -n nn -a albedo --options {blendFactorCommand} --aovs C a Cf Color Ci Nn motionBack z albedo beauty directDiffuse directSpecular indirectDiffuse indirectSpecular subsurface directSpecularGlassLobe indirectSpecularGlassLobe subsurfaceLobe transmissiveGlassLobe shadow __depth"
 
-                    # print(command)
-                    subprocess.call(command, cwd=folderPath, shell=True)
-                    print(f"Finished ({i + 1}/{len(images)}) {img} in {folderPath}.")
+                    result = subprocess.run(
+                        command, cwd=folderPath, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+                    stdout = result.stdout
+                    if stdout is not None:
+                        stdout = stdout.decode("utf-8")
+                        if len(stdout) > 0:
+                            errors.append(f"{img}: {stdout}")
 
                 permissions.set_permissions(folderPath)
-                print(f"Finished denoising {folderPath}. ({len(images)} images denoised)")
+                print(f"Finished denoising {os.path.basename(folderPath)}. ({len(images)} images denoised)")
+                if len(errors) > 0:
+                    print(f"{len(errors)} Errors:")
+                    for error in errors:
+                        print(error)
 
             # Start a thread for each folder
             thread = threading.Thread(target=denoiseFolder, args=(itemPath,))
             thread.start()
-            print(f"Started thread for {itemPath}")
+
+    def denoiseFrame(self):
+        """Denoise individual frame(s)."""
+        framesToDenoise = []
+
+        for i in range(self.frameList.count()):
+            item = self.frameList.item(i)
+            if item.checkState() == QtCore.Qt.Checked:
+                framePath = os.path.join(self.renderFolder, item.text())
+                framesToDenoise.append(framePath)
+
+        aovs = []
+        for i in range(self.aovList.count()):
+            item = self.aovList.item(i)
+            if item.checkState() == QtCore.Qt.Checked:
+                aovs.append(item.text())
+
+        aovs = " ".join(aovs)
+
+        blendFactor = self.blendFactorLineEdit.text()
+        blendFactorCommand = '\'{"blendfactor":' + str(blendFactor) + '}\''
+        for frame in framesToDenoise:
+            print(f"Denoising {os.path.basename(frame)}")
+            inPath = frame
+            outPath = os.path.abspath(os.path.join(self.renderFolder, os.pardir, os.path.basename(frame)))
+            command = f"idenoise {inPath} {outPath} -d oidn -n nn -a albedo --options {blendFactorCommand} --aovs {aovs}"
+            result = subprocess.run(command, cwd=os.path.dirname(frame), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+            permissions.set_permissions(outPath)
+
+            stdout = result.stdout
+            if stdout is not None:
+                stdout = stdout.decode("utf-8")
+                if len(stdout) > 0:
+                    print(stdout)
+                else:
+                    print("Denoising successful!")
 
 
 if __name__ == '__main__':
+    # import time
+    # for i in tqdm(range(5)):
+    #     time.sleep(1)
     app = QtWidgets.QApplication(sys.argv)
-    # app.setStyleSheet(open(':/stylesheets/videoConverter.qss').read())
-    videoConverter = DenoiserWidget()
-    videoConverter.show()
+    denoiser = DenoiserWidget()
+    denoiser.show()
     sys.exit(app.exec_())
