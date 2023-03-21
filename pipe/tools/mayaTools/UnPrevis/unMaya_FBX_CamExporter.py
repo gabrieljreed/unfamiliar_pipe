@@ -41,7 +41,13 @@ class Camera_Exporter:
             if confirm == "Ok":
                 pass
         else:
-            shotCam_name = curr_selection[0].split(':')[0]
+            split_names = curr_selection[0].split(':')
+            if len(split_names) > 2:
+                shotCam_name = ''
+                for i in range(0,len(split_names)-1):
+                    shotCam_name = shotCam_name + ':' + split_names[i]
+            else:
+                shotCam_name = curr_selection[0].split(':')[0]
             shotCam_main = shotCam_name + ':Main'            
             self.selected_cam = [shotCam_main]
             cmds.select(shotCam_main)
@@ -232,7 +238,8 @@ class Camera_Exporter:
     #Initiates the exporter for houdini and unreal, as well as the comment gui
     def trigger_exports(self):
         self.exportFBX_houdini()
-        self.exportFBX_unreal()
+        if self.unreal_filepath != "nounreal":
+            self.exportFBX_unreal()
 
     # Sets the self.houdini_filepath variable and creates the camera directory if it does not already exist
     def set_houdini_filepath(self, withFile):
@@ -251,6 +258,8 @@ class Camera_Exporter:
     # Sets the self.unreal_filepath variablet
     def set_unreal_filepath(self, withFile):
         filepath = self.find_shot_file()
+        if filepath == "nounreal":
+            self.unreal_filepath = filepath
                 
         if withFile:
             self.unreal_filepath_noExt = filepath + "/camera_main"
@@ -264,7 +273,7 @@ class Camera_Exporter:
         shot_sections = self.shot_selection.split('_')
         
         sequence_list = self.curr_env.get_shot_list_undef(self.PREVIS_SEQUENCE_FILEPATH)
-        if "test" not in shot_sections:
+        if "test" not in shot_sections and "render" not in shot_sections and "Issues" not in shot_sections:
             sequence_list = sorted(sequence_list)
             sequence_list = sequence_list[1:-1]
             
@@ -309,6 +318,8 @@ class Camera_Exporter:
                 permissions.set_permissions(curr_filepath)
     
             return curr_filepath
+        else:
+            return "nounreal"
     
     # Takes the subsequence and splits into into a dictionary including the sequence, start shot and end shot
     def split_subsequence_name(self, subsequence):
