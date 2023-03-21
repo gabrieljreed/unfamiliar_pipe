@@ -93,4 +93,7 @@ class ShotCheckout(QtWidgets.QMainWindow):
         else:
             nuke.scriptSaveAs(nukeFilePath, overwrite=1)
 
+        permissions.set_permissions(nukeFilePath)
+        permissions.set_permissions(os.path.dirname(nukeFilePath))
+
         self.close()
