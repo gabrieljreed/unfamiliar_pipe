@@ -22,6 +22,9 @@ export MAYA_ICONS_DIR=${MEDIA_PROJECT_DIR}'/icons/'
 #WE HATE ACES
 unset OCIO
 
+# Run the script mayaStartupImage.py to set the startup image
+python3 /groups/unfamiliar/anim_pipeline/launch/mayaStartupImage.py
+
 #Start Maya
 echo "Starting Maya..."
 maya #-script ${MEDIA_PROJECT_DIR}/pipe/tools/mayaTools/custom/shelf.mel &
