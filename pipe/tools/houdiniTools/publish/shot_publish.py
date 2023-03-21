@@ -6,6 +6,7 @@ import pipe.pipeHandlers.gui as gui
 from pipe.pipeHandlers.element import Element
 import os
 import shutil
+import pipe.tools.pythonTools.stringUtilities as string_utils
 
 
 # This class publishes the shot back to the pipe. This includes version control.
@@ -17,9 +18,20 @@ class ShotPublish:
 
     # Starts the gui for publishing shots
     def publish(self):
+        # Query the current filename to see if it is a shot
+        current_file = hou.hipFile.name()
+        current_shot = os.path.basename(current_file)
+        current_shot = os.path.splitext(current_shot)[0]
+        current_shot = string_utils.stripSuffix(current_shot, "_main")
+
         # Intilize gui with the shot list
-        self.item_gui = gui.SelectFromList(inputList=self.shot_list, parent=hou.ui.mainQtWindow(), 
+        self.item_gui = gui.SelectFromList(inputList=self.shot_list, parent=hou.ui.mainQtWindow(),
                                            title="Select a shot to publish")
+        # Check if current_shot is in the shot list
+        if current_shot in self.shot_list:
+            # Select that shot in the list widget
+            self.item_gui.listWidget.setCurrentRow(self.shot_list.index(current_shot))
+
         # Send results from gui to the results method
         self.item_gui.submitted.connect(self.results)
 
