@@ -1,0 +1,253 @@
+#! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_F.mov" format:"2048 1556 1" chans:":" framerange:"1 1034" fps:"0" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" colorManagement:"OCIO"
+version 13.2 v2
+Root {
+ inputs 0
+ last_frame 1034
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath /opt/pixar/RenderManProServer-24.4/lib/ocio/ACES-1.2/config.ocio
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/sRGB
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_210/F_210.mov
+ last 58
+ origlast 58
+ origset true
+ colorspace color_picking
+ name Read20
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_190/F_190.mov
+ last 40
+ origlast 40
+ origset true
+ colorspace color_picking
+ name Read19
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_180/F_180.mov
+ last 13
+ origlast 13
+ origset true
+ colorspace color_picking
+ name Read18
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/F_175/F_175.mov
+ last 36
+ origlast 36
+ origset true
+ colorspace color_picking
+ name Read17
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_170_3/F_170_3.mov
+ last 97
+ origlast 97
+ origset true
+ colorspace color_picking
+ name Read16
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_170_2/F_170_2.mov
+ last 25
+ origlast 25
+ origset true
+ colorspace color_picking
+ name Read15
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_170/F_170.mov
+ last 60
+ origlast 60
+ origset true
+ colorspace color_picking
+ name Read14
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/F_140/F_140.mov
+ last 180
+ origlast 180
+ origset true
+ colorspace color_picking
+ name Read13
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_130/F_130.mov
+ last 51
+ origlast 51
+ origset true
+ colorspace color_picking
+ name Read12
+}
+push 0
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_127/F_127.mov
+ last 26
+ origlast 26
+ origset true
+ colorspace color_picking
+ name Read11
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_123/F_123.mov
+ last 22
+ origlast 22
+ origset true
+ colorspace color_picking
+ name Read10
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_120/F_120_W_Bolt.mov
+ last 50
+ origlast 50
+ origset true
+ colorspace color_picking
+ name Read9
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_110/F_110.mov
+ last 60
+ origlast 60
+ origset true
+ colorspace color_picking
+ name Read8
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_100/F_100_W_Bolt.mov
+ last 24
+ origlast 24
+ origset true
+ colorspace color_picking
+ name Read7
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_090/F_090.mov
+ last 55
+ origlast 55
+ origset true
+ colorspace color_picking
+ name Read6
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_080/F_080_w_bolt.mov
+ last 24
+ origlast 24
+ origset true
+ colorspace color_picking
+ name Read5
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_070/F_070.mov
+ last 30
+ origlast 30
+ origset true
+ colorspace color_picking
+ name Read4
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_060/F_060.mov
+ last 96
+ origlast 96
+ origset true
+ colorspace color_picking
+ name Read3
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_050/F_050.mov
+ last 17
+ origlast 17
+ origset true
+ colorspace color_picking
+ name Read2
+}
+Read {
+ inputs 0
+ file_type mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/F_040/F_040.mov
+ last 70
+ origlast 70
+ origset true
+ colorspace color_picking
+ name Read1
+}
+push 0
+push 0
+push 0
+AppendClip {
+ inputs 24
+ meta_from_first false
+ time ""
+ name AppendClip1
+}
+Write {
+ file /groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_F.mov
+ colorspace color_picking
+ file_type mov
+ mov64_codec appr
+ mov_prores_codec_profile "ProRes 4:4:4:4 XQ 12-bit"
+ mov_h264_codec_profile "High 4:2:0 8-bit"
+ mov64_pixel_format {{0}}
+ mov64_quality High
+ mov64_fast_start true
+ mov64_write_timecode true
+ mov64_gop_size 12
+ mov64_b_frames 0
+ mov64_bitrate 20000
+ mov64_bitrate_tolerance 4000000
+ mov64_quality_min 1
+ mov64_quality_max 3
+ create_directories true
+ checkHashOnRead false
+ name Write1
+ selected true
+}

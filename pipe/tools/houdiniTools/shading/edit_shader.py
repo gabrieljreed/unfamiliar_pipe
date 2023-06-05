@@ -164,7 +164,7 @@ class EditShader():
             '''
             okay I don't know why but when you reopen the shader for editing, it
             messes up all the filepaths and also deactivates every single 
-            parameter. why. Anyway, this section activates all the parameters and 
+            parameter. So this section activates all the parameters and 
             corrects the filepaths. 
             '''
             #activate all parameters 

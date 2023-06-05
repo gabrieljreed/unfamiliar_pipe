@@ -396,6 +396,7 @@ class DenoiserWidget(QtWidgets.QWidget):
                     if stdout is not None:
                         stdout = stdout.decode("utf-8")
                         if len(stdout) > 0:
+                            print(stdout)
                             errors.append(f"{img}: {stdout}")
 
                 permissions.set_permissions(folderPath)

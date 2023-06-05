@@ -4,8 +4,7 @@ import os
 #This class gets the name of an asset from a selected material library node, 
 #then builds a basic shading network based on that information. 
 
-BASE_PATH = "/groups/unfamiliar/anim_pipeline/production/assets/ring_box/materials/textures/RingBox_D_040/"
-stageLocation = "/stage/ring_box_DO_NOT_DELETE_OR_ELSE_heart_emoji/"
+BASE_PATH = "/users/animation/hales579/Desktop/book_i_guess/"
 
 class BuildShader():
 
@@ -154,7 +153,7 @@ class BuildShader():
         print("building a "+self.purpose+" shader")
         print("Creating shader for \""+self.shaderName+"\". Maps located at \""+self.filePath+"\"")
 
-        matLibLoc = stageLocation+str(self.shaderName)+"/" #"/stage/"+self.prefix+str(self.shaderName)+"/"
+        matLibLoc = "/stage/"+str(self.shaderName)+"/" #"/stage/"+self.prefix+str(self.shaderName)+"/"
         matLib = hou.node(matLibLoc)
         print("matLibLoc = "+str(matLibLoc))
         print("matLib = "+str(matLib))

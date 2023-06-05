@@ -1,9 +1,9 @@
 #! /opt/Nuke13.2v2/libnuke-13.2.2.so -nx
-#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_C.mov" format:"1998 1080 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 1014" fps:"24" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" timecode:"00:00:00:00" colorManagement:"OCIO"
+#write_info Write1 file:"/groups/unfamiliar/anim_pipeline/production/edit/sequences/SEQ_C.mov" format:"1280 692 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"1 1032" fps:"24" colorspace:"color_picking	color_picking (Output - sRGB)" datatype:"unknown" transfer:"unknown" views:"main" timecode:"00:00:00:00" colorManagement:"OCIO"
 version 13.2 v2
 Root {
  inputs 0
- last_frame 1014
+ last_frame 1032
  format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
  proxy_type scale
  proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
@@ -22,7 +22,7 @@ Root {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_110/C_110.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_110/C_110.mov
  last 151
  origlast 151
  origset true
@@ -32,7 +32,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_105/C_105.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/02_anim_playblast/C_105/C_105.mov
  last 63
  origlast 63
  origset true
@@ -52,7 +52,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_090/C_090.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_090/C_090.mov
  last 278
  origlast 278
  origset true
@@ -62,7 +62,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_080/C_080.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_080/C_080.mov
  last 40
  origlast 40
  origset true
@@ -72,7 +72,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_070/C_070.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_070/C_070.mov
  last 20
  origlast 20
  origset true
@@ -82,7 +82,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_060/C_060.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_060/C_060.mov
  last 27
  origlast 27
  origset true
@@ -92,7 +92,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_050/C_050.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_050/C_050.mov
  last 104
  origlast 104
  origset true
@@ -102,7 +102,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_040/C_040.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_040/C_040.mov
  last 60
  origlast 60
  origset true
@@ -112,7 +112,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_030/C_030.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_030/C_030.mov
  last 78
  origlast 78
  origset true
@@ -123,8 +123,8 @@ Read {
  inputs 0
  file_type mov
  file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_020/C_020.mov
- last 60
- origlast 60
+ last 78
+ origlast 78
  origset true
  colorspace color_picking
  name Read2
@@ -132,7 +132,7 @@ Read {
 Read {
  inputs 0
  file_type mov
- file /groups/unfamiliar/anim_pipeline/production/edit/shots/05_temp_mp4/C_010/C_010.mov
+ file /groups/unfamiliar/anim_pipeline/production/edit/shots/04_lighting_beauty/C_010/C_010.mov
  last 99
  origlast 99
  origset true
